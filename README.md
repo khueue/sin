@@ -2,11 +2,11 @@
 
 Sin (**s**ource **in**ventory) collects license information from all input files
 using [ScanCode](https://github.com/nexB/scancode-toolkit) and saves the
-results to a local database for further analysis.
+results to a local database for incremental updates and further analysis.
 
 Features:
 
--  **Incremental processing** - Saves state in a local SQLite database to
+-  **Incremental processing** - Maintains state in a local SQLite database to
    make sure to only process new/moved/modified files, which greatly speeds up
    subsequent scans. Suitable for CI/CD.
 -  **Tool for manual investigation** - CLI tool to show suspicious files
@@ -14,3 +14,71 @@ Features:
    exceptions.
 -  **Simple database** - Manages a simple SQLite database that can be easily
    browsed or consumed by other tools.
+
+# Usage
+
+## Prerequisites
+
+-  Docker.
+
+## Input to Sin
+
+-  `/data/src`. Sin assumes that this dir contains all files that you wish to
+   scan, **including installed dependencies**. Make sure everything is
+   installed and available in this dir. Can be mounted read-only. You could
+   organize your files like this:
+   -  `/data/src/repo1`
+   -  `/data/src/repo2`
+   -  etc.
+-  `/data/db`. Sin will maintain a file called `db.sqlite` in this dir. It will
+   be created if it does not exist. It's a good idea to keep this file backed
+   up, since the idea is to use it over time.
+-  `/data/tmp` _(optional)_. Sin creates a timestamped workspace inside this dir
+   every time it's invoked, where all temporary files and reports are stored.
+   Mount this folder if you wish to expose these files to your host (useful
+   for debugging etc.).
+
+## Example
+
+Make sure the dirs to be mounted exist on the host:
+
+```
+mkdir -p ./data/db
+mkdir -p ./data/src
+mkdir -p ./data/tmp
+```
+
+Then run a container with Sin:
+
+```
+docker run --interactive --tty --rm --init \
+   --mount type="bind",source="$(PWD)/data/db",target="/data/db",consistency="delegated" \
+   --mount type="bind",source="$(PWD)/data/src",target="/data/src",readonly \
+   --mount type="bind",source="$(PWD)/data/tmp",target="/data/tmp",consistency="delegated" \
+   --entrypoint bash \
+   khueue/sin:0.0.1
+```
+
+The above command will place you inside a bash shell, allowing you to run
+the tool, `sin.ts`:
+
+```
+$ sin.ts
+Usage: sin [options] [command]
+
+Collects license information from all input files using ScanCode
+and saves the results to a local database for further analysis
+
+Options:
+  -h, --help                 display help for command
+
+Commands:
+  scan [options] [pattern]   Scan input and update database with license findings
+  audit [options]            Generate report of suspicious files
+  view <file_path>           View contents of a file
+  accepted [options]         Generate report of all manually accepted files
+  accept <pattern> <reason>  Mark suspicious files as accepted
+  unaccept <pattern>         Un-mark previously accepted files so they appear suspicious again
+  licenses                   Manage globally allowed licenses (applied on every audit)
+  help [command]             display help for command
+```

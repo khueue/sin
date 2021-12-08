@@ -1,6 +1,9 @@
 __default:
 	@ cat ./Makefile
 
+VERSION=0.0.1
+IMAGE_TAG=khueue/sin:$(VERSION)
+
 install:
 	make shell cmd="yarn install"
 
@@ -13,14 +16,8 @@ test:
 coverage:
 	make shell cmd="yarn cov"
 
-# ------------------------------------------------------------------------------
-
-create_dirs:
-	mkdir -p ./data/db
-	mkdir -p ./data/src
-	mkdir -p ./data/tmp
-
-IMAGE_TAG=sin
+publish:
+	docker push $(IMAGE_TAG)
 
 cmd := bash
 shell: create_dirs build_image
@@ -33,6 +30,11 @@ shell: create_dirs build_image
 		--entrypoint bash \
 		$(IMAGE_TAG) \
 		-c "$(cmd)"
+
+create_dirs:
+	mkdir -p ./data/db
+	mkdir -p ./data/src
+	mkdir -p ./data/tmp
 
 build_image:
 	docker build \
