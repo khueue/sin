@@ -62,8 +62,7 @@ docker run --interactive --tty --rm --init \
    --mount type="bind",source="$(PWD)/data/db",target="/data/db",consistency="delegated" \
    --mount type="bind",source="$(PWD)/data/src",target="/data/src",readonly \
    --mount type="bind",source="$(PWD)/data/tmp",target="/data/tmp",consistency="delegated" \
-   --entrypoint bash \
-   khueue/sin:0.0.1
+   khueue/sin:0.0.4
 ```
 
 The above command will place you inside a bash shell, allowing you to run

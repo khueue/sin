@@ -1,7 +1,7 @@
 __default:
 	@ cat ./Makefile
 
-VERSION=0.0.1
+VERSION=0.0.4
 IMAGE_TAG=khueue/sin:$(VERSION)
 
 install:
@@ -16,7 +16,8 @@ test:
 coverage:
 	make shell cmd="yarn cov"
 
-publish:
+release: build_image
+	docker login --username khueue
 	docker push $(IMAGE_TAG)
 
 cmd := bash

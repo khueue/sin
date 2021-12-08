@@ -59,7 +59,7 @@ WORKDIR /app
 
 COPY ./app/package.json ./
 RUN yarn install
+COPY ./app/lib/ ./lib/
+COPY ./app/*.* ./
 
-COPY ./app/ ./
-
-ENTRYPOINT [ "./sin.ts" ]
+ENTRYPOINT [ "bash" ]
