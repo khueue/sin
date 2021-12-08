@@ -14,6 +14,8 @@ import { ScanStep5 } from './scan-step-5'
 import { FileTree } from './tree'
 import type { AnalysedFile, AnalysedFileRow, BasicLogger } from './types'
 
+const CLI_NAME = 'sin.ts'
+
 interface Config {
 	db: LocalDatabase
 	logger: BasicLogger
@@ -49,6 +51,7 @@ export class Cli {
 	}
 
 	async run(cliArgs: string[]) {
+		this.program.name(CLI_NAME)
 		this.program.description(
 			[
 				`Collects license information from all input files using ScanCode`,
