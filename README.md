@@ -71,7 +71,7 @@ the tool, `sin.ts`:
 
 ```
 $ sin.ts
-Usage: sin [options] [command]
+Usage: sin.ts [options] [command]
 
 Collects license information from all input files using ScanCode
 and saves the results to a local database for further analysis
