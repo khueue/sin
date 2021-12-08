@@ -1,60 +1,60 @@
-import chalk from 'chalk';
-import { mkdir, readFile, writeFile } from 'fs/promises';
-import { tmpdir } from 'os';
-import { dirname } from 'path';
-import { $ } from 'zx';
-import type { LocalDatabase } from './db';
-import { Detective } from './detective';
-import { FileTree } from './tree';
-import type { AnalysedFileRow, BasicLogger } from './types';
+import chalk from 'chalk'
+import { mkdir, readFile, writeFile } from 'fs/promises'
+import { tmpdir } from 'os'
+import { dirname } from 'path'
+import { $ } from 'zx'
+import type { LocalDatabase } from './db'
+import { Detective } from './detective'
+import { FileTree } from './tree'
+import type { AnalysedFileRow, BasicLogger } from './types'
 
 interface Config {
-	db: LocalDatabase;
-	logger: BasicLogger;
-	auditOutPath: string;
-	verbose?: boolean;
+	db: LocalDatabase
+	logger: BasicLogger
+	auditOutPath: string
+	verbose?: boolean
 }
 
 export class ScanStep5 {
-	db: LocalDatabase;
-	logger: BasicLogger;
-	auditOutPath: string;
-	verbose: boolean;
+	db: LocalDatabase
+	logger: BasicLogger
+	auditOutPath: string
+	verbose: boolean
 
 	constructor(config: Config) {
-		this.db = config.db;
-		this.verbose = config.verbose ?? false;
-		this.logger = config.logger;
-		this.auditOutPath = config.auditOutPath;
+		this.db = config.db
+		this.verbose = config.verbose ?? false
+		this.logger = config.logger
+		this.auditOutPath = config.auditOutPath
 	}
 
 	async run() {
-		this.logger.info(chalk`{yellow === STEP 5: Gather suspicious findings}`);
+		this.logger.info(chalk`{yellow === STEP 5: Gather suspicious findings}`)
 
-		this.logger.info(`Analysing suspicious files in database ...`);
-		const files = this.db.fetchAnalysedFilesNeedingInvestigation();
+		this.logger.info(`Analysing suspicious files in database ...`)
+		const files = this.db.fetchAnalysedFilesNeedingInvestigation()
 		const detective = new Detective(
 			this.db.allowedSpecificLicenses,
 			this.db.allowedLicenseCategories,
-		);
-		const tree = new FileTree(Object.values(files), detective);
-		tree.pruneLevelsWithAcceptedLicenses();
-		tree.pruneAllowedFiles();
-		tree.pruneEmptyNodes();
+		)
+		const tree = new FileTree(Object.values(files), detective)
+		tree.pruneLevelsWithAcceptedLicenses()
+		tree.pruneAllowedFiles()
+		tree.pruneEmptyNodes()
 
 		if (this.verbose) {
-			await this.runDetailedScans(tree);
+			await this.runDetailedScans(tree)
 		}
 
-		const numFindings = tree.countLeaves();
-		this.logger.info(`  done (found ${numFindings}).`);
+		const numFindings = tree.countLeaves()
+		this.logger.info(`  done (found ${numFindings}).`)
 
-		const jsonString = tree.toJson();
-		await mkdir(dirname(this.auditOutPath), { recursive: true });
-		await writeFile(this.auditOutPath, jsonString, 'utf-8');
+		const jsonString = tree.toJson()
+		await mkdir(dirname(this.auditOutPath), { recursive: true })
+		await writeFile(this.auditOutPath, jsonString, 'utf-8')
 
-		this.logger.info(`Investigation saved to: ${this.auditOutPath}`);
-		return tree;
+		this.logger.info(`Investigation saved to: ${this.auditOutPath}`)
+		return tree
 	}
 
 	async runDetailedScans(tree: FileTree) {
@@ -62,17 +62,17 @@ export class ScanStep5 {
 			SELECT content_text
 			FROM analysed_files
 			WHERE file_path = :file_path
-		`);
+		`)
 		await tree.applyToLeaves(tree.root, async (node) => {
 			this.logger.info(
 				`Running detailed on-the-fly ScanCode analysis for: ${node.filePath}`,
-			);
+			)
 			const row = stmt.get({
 				file_path: node.filePath,
-			}) as AnalysedFileRow;
-			const pathToScan = `${tmpdir()}/tmp-content-file`;
-			await writeFile(pathToScan, row.content_text ?? '', 'utf-8');
-			const detailedReportPath = `${tmpdir()}/tmp-scancode.json`;
+			}) as AnalysedFileRow
+			const pathToScan = `${tmpdir()}/tmp-content-file`
+			await writeFile(pathToScan, row.content_text ?? '', 'utf-8')
+			const detailedReportPath = `${tmpdir()}/tmp-scancode.json`
 			const cmd = [
 				'scancode',
 				'--quiet',
@@ -83,23 +83,23 @@ export class ScanStep5 {
 				'--json',
 				detailedReportPath,
 				pathToScan,
-			];
-			await $`${cmd}`;
-			const detailedReportJson = await readFile(detailedReportPath, 'utf-8');
-			const detailedReport = JSON.parse(detailedReportJson);
-			const nodeAsAny = node as any;
+			]
+			await $`${cmd}`
+			const detailedReportJson = await readFile(detailedReportPath, 'utf-8')
+			const detailedReport = JSON.parse(detailedReportJson)
+			const nodeAsAny = node as any
 			for (const scannedFile of detailedReport.files) {
 				if (scannedFile.path === pathToScan) {
-					delete scannedFile.path; // Misleading (temp path).
-					nodeAsAny.scanCodeReport = scannedFile;
-					break;
+					delete scannedFile.path // Misleading (temp path).
+					nodeAsAny.scanCodeReport = scannedFile
+					break
 				}
 			}
 			if (!nodeAsAny.scanCodeReport) {
 				this.logger.error(
 					`Could not generate detailed ScanCode report for: ${node.filePath}`,
-				);
+				)
 			}
-		});
+		})
 	}
 }

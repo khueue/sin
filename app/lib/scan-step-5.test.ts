@@ -1,20 +1,20 @@
-import { $ } from 'zx';
-import { LocalDatabase } from './db';
-import { ScanStep5 } from './scan-step-5';
-import { createTestConfig, testLogger } from './test-utils';
-import type { AnalysedFile } from './types';
+import { $ } from 'zx'
+import { LocalDatabase } from './db'
+import { ScanStep5 } from './scan-step-5'
+import { createTestConfig, testLogger } from './test-utils'
+import type { AnalysedFile } from './types'
 
 test('audit', async () => {
-	const testConf = await createTestConfig();
-	const logger = testLogger();
-	$.verbose = false;
+	const testConf = await createTestConfig()
+	const logger = testLogger()
+	$.verbose = false
 
 	const db = new LocalDatabase({
 		sqlitePath: testConf.dbPath,
 		logger,
-	});
-	db.allowedSpecificLicenses = ['Ruby License'];
-	db.allowedLicenseCategories = ['Permissive'];
+	})
+	db.allowedSpecificLicenses = ['Ruby License']
+	db.allowedLicenseCategories = ['Permissive']
 
 	const dbFiles: AnalysedFile[] = [
 		{
@@ -69,31 +69,31 @@ test('audit', async () => {
 				Hello
 			`,
 		},
-	];
-	prepareDbFiles(db, dbFiles);
+	]
+	prepareDbFiles(db, dbFiles)
 
 	const step = new ScanStep5({
 		db,
 		logger,
 		auditOutPath: testConf.auditOutPath,
 		verbose: true,
-	});
-	const auditTree = await step.run();
+	})
+	const auditTree = await step.run()
 
-	const countFindings = auditTree.countLeaves();
-	expect(countFindings).toBe(1);
+	const countFindings = auditTree.countLeaves()
+	expect(countFindings).toBe(1)
 
-	const detailedReport = auditTree.root['a1']['with-gpl.txt'].scanCodeReport;
+	const detailedReport = auditTree.root['a1']['with-gpl.txt'].scanCodeReport
 
-	const gplFinding = detailedReport.licenses[0];
-	expect(gplFinding.matched_text).toContain('GPL License // line 2');
+	const gplFinding = detailedReport.licenses[0]
+	expect(gplFinding.matched_text).toContain('GPL License // line 2')
 
-	const mitFinding = detailedReport.licenses[1];
-	expect(mitFinding.matched_text).toContain('MIT License // line 3');
-});
+	const mitFinding = detailedReport.licenses[1]
+	expect(mitFinding.matched_text).toContain('MIT License // line 3')
+})
 
 function prepareDbFiles(db: LocalDatabase, files: AnalysedFile[]) {
 	for (const file of files) {
-		db.upsertFile(file, false);
+		db.upsertFile(file, false)
 	}
 }

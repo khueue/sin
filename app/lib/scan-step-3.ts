@@ -1,42 +1,42 @@
-import chalk from 'chalk';
-import { existsSync } from 'fs';
-import { mkdir } from 'fs/promises';
-import { cpus } from 'os';
-import { dirname } from 'path';
-import { $ } from 'zx';
-import type { BasicLogger } from './types';
+import chalk from 'chalk'
+import { existsSync } from 'fs'
+import { mkdir } from 'fs/promises'
+import { cpus } from 'os'
+import { dirname } from 'path'
+import { $ } from 'zx'
+import type { BasicLogger } from './types'
 
 interface Config {
-	dirtyRoot: string;
-	logger: BasicLogger;
-	scanCodeOutPath: string;
-	verbose?: boolean;
+	dirtyRoot: string
+	logger: BasicLogger
+	scanCodeOutPath: string
+	verbose?: boolean
 }
 
 export class ScanStep3 {
-	dirtyRoot: string;
-	logger: BasicLogger;
-	scanCodeOutPath: string;
-	verbose: boolean;
+	dirtyRoot: string
+	logger: BasicLogger
+	scanCodeOutPath: string
+	verbose: boolean
 
 	constructor(config: Config) {
-		this.dirtyRoot = config.dirtyRoot;
-		this.logger = config.logger;
-		this.scanCodeOutPath = config.scanCodeOutPath;
-		this.verbose = config.verbose ?? false;
+		this.dirtyRoot = config.dirtyRoot
+		this.logger = config.logger
+		this.scanCodeOutPath = config.scanCodeOutPath
+		this.verbose = config.verbose ?? false
 	}
 
 	async run() {
-		this.logger.info(chalk`{yellow === STEP 3: Run ScanCode on dirty files}`);
+		this.logger.info(chalk`{yellow === STEP 3: Run ScanCode on dirty files}`)
 
 		if (!existsSync(this.dirtyRoot)) {
-			this.logger.info(`Nothing to be done (no dirty files).`);
-			return;
+			this.logger.info(`Nothing to be done (no dirty files).`)
+			return
 		}
 
-		await mkdir(dirname(this.scanCodeOutPath), { recursive: true });
+		await mkdir(dirname(this.scanCodeOutPath), { recursive: true })
 
-		const verboseFlag = this.verbose ? '--verbose' : '';
+		const verboseFlag = this.verbose ? '--verbose' : ''
 		const cmd = [
 			'scancode',
 			verboseFlag,
@@ -49,7 +49,7 @@ export class ScanStep3 {
 			'--json',
 			this.scanCodeOutPath,
 			this.dirtyRoot,
-		];
-		await $`${cmd}`;
+		]
+		await $`${cmd}`
 	}
 }

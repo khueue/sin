@@ -1,14 +1,14 @@
-import { Detective } from './detective';
-import { FileTree } from './tree';
-import type { AnalysedFile } from './types';
+import { Detective } from './detective'
+import { FileTree } from './tree'
+import type { AnalysedFile } from './types'
 
 test('empty tree', () => {
-	const files: AnalysedFile[] = [];
-	const detective = new Detective([], []);
-	const tree = new FileTree(files, detective);
+	const files: AnalysedFile[] = []
+	const detective = new Detective([], [])
+	const tree = new FileTree(files, detective)
 
-	expect(tree.root).toEqual({});
-});
+	expect(tree.root).toEqual({})
+})
 
 test('non-empty tree', () => {
 	const files: AnalysedFile[] = [
@@ -24,9 +24,9 @@ test('non-empty tree', () => {
 		{
 			filePath: 'a1/file4',
 		},
-	];
-	const detective = new Detective([], []);
-	const tree = new FileTree(files, detective);
+	]
+	const detective = new Detective([], [])
+	const tree = new FileTree(files, detective)
 
 	expect(tree.root).toEqual({
 		a1: {
@@ -47,12 +47,12 @@ test('non-empty tree', () => {
 				filePath: 'a1/file4',
 			},
 		},
-	});
-});
+	})
+})
 
 test('prune recursive under okay license file', () => {
-	const detective = new Detective(['Ruby License'], []);
-	const tree = new FileTree([], detective);
+	const detective = new Detective(['Ruby License'], [])
+	const tree = new FileTree([], detective)
 	tree.root = {
 		a1: {
 			a2: {
@@ -77,8 +77,8 @@ test('prune recursive under okay license file', () => {
 		file4: {
 			filePath: 'file4',
 		},
-	};
-	tree.pruneLevelsWithAcceptedLicenses();
+	}
+	tree.pruneLevelsWithAcceptedLicenses()
 
 	expect(tree.root).toEqual({
 		a1: {
@@ -90,12 +90,12 @@ test('prune recursive under okay license file', () => {
 		file4: {
 			filePath: 'file4',
 		},
-	});
-});
+	})
+})
 
 test('prune empty nodes', () => {
-	const detective = new Detective([], []);
-	const tree = new FileTree([], detective);
+	const detective = new Detective([], [])
+	const tree = new FileTree([], detective)
 	tree.root = {
 		a1: {
 			a2: {},
@@ -108,8 +108,8 @@ test('prune empty nodes', () => {
 				b3: {},
 			},
 		},
-	};
-	tree.pruneEmptyNodes();
+	}
+	tree.pruneEmptyNodes()
 
 	expect(tree.root).toEqual({
 		a1: {
@@ -119,12 +119,12 @@ test('prune empty nodes', () => {
 			},
 		},
 		// b1 is gone.
-	});
-});
+	})
+})
 
 test('prune individually accepted', () => {
-	const detective = new Detective(['Ruby License'], ['Permissive']);
-	const tree = new FileTree([], detective);
+	const detective = new Detective(['Ruby License'], ['Permissive'])
+	const tree = new FileTree([], detective)
 	tree.root = {
 		a1: {
 			a2: {
@@ -170,8 +170,8 @@ test('prune individually accepted', () => {
 				},
 			],
 		} as AnalysedFile,
-	};
-	tree.pruneAllowedFiles();
+	}
+	tree.pruneAllowedFiles()
 
 	expect(tree.root).toEqual({
 		a1: {
@@ -186,12 +186,12 @@ test('prune individually accepted', () => {
 				},
 			],
 		} as AnalysedFile,
-	});
-});
+	})
+})
 
 test('count leaves', () => {
-	const detective = new Detective([], []);
-	const tree = new FileTree([], detective);
+	const detective = new Detective([], [])
+	const tree = new FileTree([], detective)
 	tree.root = {
 		a1: {
 			a2: {
@@ -209,15 +209,15 @@ test('count leaves', () => {
 		file4: {
 			filePath: 'file4',
 		} as AnalysedFile,
-	};
-	const count = tree.countLeaves();
+	}
+	const count = tree.countLeaves()
 
-	expect(count).toBe(4);
-});
+	expect(count).toBe(4)
+})
 
 test('apply to leaves', async () => {
-	const detective = new Detective([], []);
-	const tree = new FileTree([], detective);
+	const detective = new Detective([], [])
+	const tree = new FileTree([], detective)
 	tree.root = {
 		a1: {
 			a2: {
@@ -235,11 +235,11 @@ test('apply to leaves', async () => {
 		file4: {
 			filePath: 'file4',
 		} as AnalysedFile,
-	};
-	const paths: string[] = [];
+	}
+	const paths: string[] = []
 	await tree.applyToLeaves(tree.root, async (file) => {
-		paths.push(file.filePath);
-	});
+		paths.push(file.filePath)
+	})
 
-	expect(paths).toEqual(['a1/a2/LICENSE', 'a1/a2/file2', 'a1/file3', 'file4']);
-});
+	expect(paths).toEqual(['a1/a2/LICENSE', 'a1/a2/file2', 'a1/file3', 'file4'])
+})

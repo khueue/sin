@@ -1,22 +1,22 @@
-import { LocalDatabase } from './db';
-import { ScanStep4 } from './scan-step-4';
+import { LocalDatabase } from './db'
+import { ScanStep4 } from './scan-step-4'
 import {
 	createTestConfig,
 	FileStub,
 	prepareDirtyFiles,
 	testLogger,
 	writeFileForce,
-} from './test-utils';
-import type { AnalysedFileRow, ScanCodeEntry } from './types';
+} from './test-utils'
+import type { AnalysedFileRow, ScanCodeEntry } from './types'
 
 test('save to db, some old', async () => {
-	const testConf = await createTestConfig();
-	const logger = testLogger();
+	const testConf = await createTestConfig()
+	const logger = testLogger()
 
 	const db = new LocalDatabase({
 		sqlitePath: testConf.dbPath,
 		logger,
-	});
+	})
 
 	const dirtyFiles: FileStub[] = [
 		{
@@ -42,10 +42,10 @@ test('save to db, some old', async () => {
 				Hello
 			`,
 		},
-	];
-	await prepareDirtyFiles(testConf, dirtyFiles);
+	]
+	await prepareDirtyFiles(testConf, dirtyFiles)
 
-	const someFile = dirtyFiles[0];
+	const someFile = dirtyFiles[0]
 	db.stmtInsertFile.run({
 		file_path: someFile.filePath,
 		content_sha256: 'old_content_sha256',
@@ -55,65 +55,62 @@ test('save to db, some old', async () => {
 		current_accepted_reason: 'old_current_accepted_reason',
 		current_accepted_at: 'old_current_accepted_at',
 		is_legal_document: 0,
-	});
+	})
 
-	const scanCodeReport = getScanCodeReport();
-	await writeFileForce(
-		testConf.scanCodeOutPath,
-		JSON.stringify(scanCodeReport),
-	);
+	const scanCodeReport = getScanCodeReport()
+	await writeFileForce(testConf.scanCodeOutPath, JSON.stringify(scanCodeReport))
 
 	const step = new ScanStep4({
 		db,
 		logger,
 		dirtyRoot: testConf.dirtyRoot,
 		scanCodeOutPath: testConf.scanCodeOutPath,
-	});
-	await step.run();
+	})
+	await step.run()
 
 	const stmt = db.sqlite.prepare(`
 		SELECT *
 		FROM analysed_files
 		WHERE file_path = :file_path
-	`);
-	const scannedFiles = scanCodeReport.files as ScanCodeEntry[];
+	`)
+	const scannedFiles = scanCodeReport.files as ScanCodeEntry[]
 	for (const reportEntry of scannedFiles) {
 		if (reportEntry.type === 'directory') {
-			continue;
+			continue
 		}
 		const row: AnalysedFileRow = stmt.get({
 			file_path: reportEntry.path,
-		});
-		const dirtyFile = findDirtyFile(dirtyFiles, reportEntry.path);
+		})
+		const dirtyFile = findDirtyFile(dirtyFiles, reportEntry.path)
 		// Should be in database with correct hash.
-		expect(row.content_sha256 === reportEntry.sha256).toBeTruthy();
+		expect(row.content_sha256 === reportEntry.sha256).toBeTruthy()
 		// Should move current reason to previous if it was already in db.
 		if (dirtyFile.inDb) {
-			expect(row.previous_accepted_reason).toBe('old_current_accepted_reason');
+			expect(row.previous_accepted_reason).toBe('old_current_accepted_reason')
 		}
 		// Should have cleared out current reason.
-		expect(row.current_accepted_reason).toBeFalsy();
-		expect(row.current_accepted_at).toBeFalsy();
+		expect(row.current_accepted_reason).toBeFalsy()
+		expect(row.current_accepted_at).toBeFalsy()
 		// Should save file contents along with licenses.
 		if (dirtyFile.shouldHaveLicenseFindings) {
-			expect(row.licenses).toBeTruthy();
-			expect(row.content_text).toBe(dirtyFile.contents);
+			expect(row.licenses).toBeTruthy()
+			expect(row.content_text).toBe(dirtyFile.contents)
 		} else {
-			expect(row.licenses).toBeFalsy();
-			expect(row.content_text).toBeFalsy();
+			expect(row.licenses).toBeFalsy()
+			expect(row.content_text).toBeFalsy()
 		}
 	}
-});
+})
 
 function findDirtyFile(dirtyFiles: FileStub[], relPath: string) {
 	for (const file of dirtyFiles) {
 		if (file.filePath === relPath) {
-			return file;
+			return file
 		}
 	}
 	throw new Error(
 		`Could not correlate ScanCode entry to dirty file: ${relPath}`,
-	);
+	)
 }
 
 function getScanCodeReport() {
@@ -448,5 +445,5 @@ function getScanCodeReport() {
 				scan_errors: [],
 			},
 		],
-	};
+	}
 }

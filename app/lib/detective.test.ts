@@ -1,17 +1,17 @@
-import { Detective } from './detective';
-import type { AnalysedFile } from './types';
+import { Detective } from './detective'
+import type { AnalysedFile } from './types'
 
 test('innocent files', async () => {
-	const detective = new Detective(['Ruby License'], ['Permissive']);
+	const detective = new Detective(['Ruby License'], ['Permissive'])
 
-	let file: AnalysedFile;
-	let suspicious: boolean;
+	let file: AnalysedFile
+	let suspicious: boolean
 
 	file = {
 		filePath: 'some/file.txt',
-	};
-	suspicious = detective.fileNeedsInvestigation(file);
-	expect(suspicious).toBeFalsy();
+	}
+	suspicious = detective.fileNeedsInvestigation(file)
+	expect(suspicious).toBeFalsy()
 
 	file = {
 		filePath: 'some/file.txt',
@@ -25,9 +25,9 @@ test('innocent files', async () => {
 				category: 'Permissive',
 			},
 		],
-	};
-	suspicious = detective.fileNeedsInvestigation(file);
-	expect(suspicious).toBeFalsy();
+	}
+	suspicious = detective.fileNeedsInvestigation(file)
+	expect(suspicious).toBeFalsy()
 
 	file = {
 		filePath: 'some/file.txt',
@@ -38,16 +38,16 @@ test('innocent files', async () => {
 			},
 		],
 		currentAcceptedAt: new Date(),
-	};
-	suspicious = detective.fileNeedsInvestigation(file);
-	expect(suspicious).toBeFalsy();
-});
+	}
+	suspicious = detective.fileNeedsInvestigation(file)
+	expect(suspicious).toBeFalsy()
+})
 
 test('suspicious files', async () => {
-	const detective = new Detective(['Ruby License'], ['Permissive']);
+	const detective = new Detective(['Ruby License'], ['Permissive'])
 
-	let file: AnalysedFile;
-	let suspicious: boolean;
+	let file: AnalysedFile
+	let suspicious: boolean
 
 	file = {
 		filePath: 'some/file.txt',
@@ -61,7 +61,7 @@ test('suspicious files', async () => {
 				category: 'Permissive',
 			},
 		],
-	};
-	suspicious = detective.fileNeedsInvestigation(file);
-	expect(suspicious).toBeTruthy();
-});
+	}
+	suspicious = detective.fileNeedsInvestigation(file)
+	expect(suspicious).toBeTruthy()
+})
