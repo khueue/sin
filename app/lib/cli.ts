@@ -3,7 +3,7 @@
 import chalk from 'chalk'
 import { Command } from 'commander'
 import { mkdir, writeFile } from 'fs/promises'
-import { dirname } from 'path'
+import { basename, dirname } from 'path'
 import type { LocalDatabase } from './db'
 import { Detective } from './detective'
 import { ScanStep1 } from './scan-step-1'
@@ -13,8 +13,6 @@ import { ScanStep4 } from './scan-step-4'
 import { ScanStep5 } from './scan-step-5'
 import { FileTree } from './tree'
 import type { AnalysedFile, AnalysedFileRow, BasicLogger } from './types'
-
-const CLI_NAME = 'sin.ts'
 
 interface Config {
 	db: LocalDatabase
@@ -51,7 +49,7 @@ export class Cli {
 	}
 
 	async run(cliArgs: string[]) {
-		this.program.name(CLI_NAME)
+		this.program.name(basename(cliArgs[1]))
 		this.program.description(
 			[
 				`Collects license information from all input files using ScanCode`,
