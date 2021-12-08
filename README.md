@@ -5,8 +5,9 @@
 
 Sin (**s**ource **in**ventory) collects **license information** from all input
 files using [ScanCode](https://github.com/nexB/scancode-toolkit) and saves the
-results to a local database for incremental updates and further analysis. This
-helps your organization keep track of the licenses that your dependencies use.
+results to a local database for incremental updates and further analysis. Sin
+helps you keep track of the licenses that your dependencies use, to make sure
+that you're not using anything unacceptable.
 
 Features:
 
