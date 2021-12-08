@@ -1,0 +1,31 @@
+{
+	"compilerOptions": {
+		"alwaysStrict": true,
+		"baseUrl": "./",
+		"declaration": false,
+		"declarationMap": false,
+		"esModuleInterop": true,
+		"exactOptionalPropertyTypes": true,
+		"forceConsistentCasingInFileNames": true,
+		"importHelpers": false,
+		"importsNotUsedAsValues": "error",
+		"isolatedModules": true,
+		"lib": ["esnext"],
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"noEmitOnError": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"pretty": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"strictPropertyInitialization": true,
+		"target": "esnext"
+	},
+	"include": ["./**/*.ts"]
+}
