@@ -1,7 +1,7 @@
 # Sin
 
 ![release](https://img.shields.io/badge/release-0.0.4-green)
-![coverage](https://img.shields.io/badge/coverage-86%-green)
+![coverage](https://img.shields.io/badge/coverage-86%25-green)
 
 Sin (**s**ource **in**ventory) collects **license information** from all input
 files using [ScanCode](https://github.com/nexB/scancode-toolkit) and saves the
