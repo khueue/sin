@@ -21,6 +21,10 @@ Sin has been tested on a codebase with over 300k files:
 -  Initial scan: ~6 hours.
 -  Subsequent scans: ~10 minutes (assuming that not many files have changed).
 
+Docker images available on Docker Hub:
+
+-  https://hub.docker.com/repository/docker/khueue/sin
+
 # Usage
 
 ## Prerequisites
