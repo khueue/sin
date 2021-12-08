@@ -1,7 +1,7 @@
 # Sin
 
-Sin (**s**ource **in**ventory) collects **license information** from all input files
-using [ScanCode](https://github.com/nexB/scancode-toolkit) and saves the
+Sin (**s**ource **in**ventory) collects **license information** from all input
+files using [ScanCode](https://github.com/nexB/scancode-toolkit) and saves the
 results to a local database for incremental updates and further analysis. This
 helps your organization keep track of the licenses that your dependencies use.
 
