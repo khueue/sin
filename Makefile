@@ -27,8 +27,6 @@ shell: create_dirs build_image
 		--mount type="bind",source="$(PWD)/data/db",target="/data/db",consistency="delegated" \
 		--mount type="bind",source="$(PWD)/data/src",target="/data/src",readonly \
 		--mount type="bind",source="$(PWD)/data/tmp",target="/data/tmp",consistency="delegated" \
-		--hostname sin \
-		--entrypoint bash \
 		$(IMAGE_TAG) \
 		-c "$(cmd)"
 

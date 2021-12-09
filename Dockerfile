@@ -40,11 +40,12 @@ RUN curl --location https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWSCL
 	&& ./aws/install \
 	&& rm -rf ./awscli.zip
 
-# Pretty terminal with basic tab-completion.
-# See: https://gist.github.com/scmx/242caa249b0ea343e2588adea14479e6
-RUN apt install -y bash-completion
-RUN echo '[[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && . /usr/share/bash-completion/bash_completion' >> ~/.bashrc
-RUN echo 'export PS1="\n🐳 \[\033[1;36m\]\h \[\033[1;34m\]\$PWD\[\033[0;35m\] \[\033[1;36m\]# \[\033[0m\]"' >> ~/.bashrc
+WORKDIR /app
+
+COPY ./app/package.json ./
+RUN yarn install
+COPY ./app/lib/ ./lib/
+COPY ./app/*.* ./
 
 # Run tool from anywhere.
 ENV PATH=/app:${PATH}
@@ -55,11 +56,10 @@ ENV PYTHONWARNINGS="ignore"
 # Give Node more space.
 ENV NODE_OPTIONS="--max_old_space_size=4096"
 
-WORKDIR /app
-
-COPY ./app/package.json ./
-RUN yarn install
-COPY ./app/lib/ ./lib/
-COPY ./app/*.* ./
+# Pretty terminal with basic tab-completion.
+# See: https://gist.github.com/scmx/242caa249b0ea343e2588adea14479e6
+RUN apt install -y bash-completion
+RUN echo '[[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && . /usr/share/bash-completion/bash_completion' >> ~/.bashrc
+RUN echo 'export PS1="\n🐳 \[\033[1;36m\]sin \[\033[1;34m\]\$PWD\[\033[0;35m\]\n\[\033[1;36m\]$ \[\033[0m\]"' >> ~/.bashrc
 
 ENTRYPOINT [ "bash" ]
