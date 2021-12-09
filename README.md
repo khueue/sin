@@ -1,6 +1,6 @@
 # Sin
 
-![release](https://img.shields.io/badge/release-0.0.4-green)
+![release](https://img.shields.io/badge/release-0.0.5-green)
 ![coverage](https://img.shields.io/badge/coverage-88%25-green)
 
 Sin (**s**ource **in**ventory) collects **license information** from all input
@@ -70,7 +70,7 @@ docker run --interactive --tty --rm --init \
    --mount type="bind",source="$(PWD)/data/db",target="/data/db",consistency="delegated" \
    --mount type="bind",source="$(PWD)/data/src",target="/data/src",readonly \
    --mount type="bind",source="$(PWD)/data/tmp",target="/data/tmp",consistency="delegated" \
-   khueue/sin:0.0.4
+   khueue/sin:0.0.5
 ```
 
 The above command will place you inside a bash shell, allowing you to run
