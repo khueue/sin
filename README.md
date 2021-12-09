@@ -129,6 +129,10 @@ The engine is configured to accept licenses using two settings:
 These globally accepted licenses are stored in the database, applied on-the-fly
 on every `sin.ts audit`, and managed by `sin.ts licenses`.
 
+Refer to "Short name" and "Category" in:
+
+-  https://scancode-licensedb.aboutcode.org/
+
 ## Manual Acceptance
 
 When rules are not enough, we need to inspect individual projects and files,
