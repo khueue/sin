@@ -113,7 +113,6 @@ test('scan', async () => {
 	expect(output).toContain(`STEP 2`)
 	expect(output).toContain(`STEP 3`)
 	expect(output).toContain(`STEP 4`)
-	expect(output).toContain(`STEP 5`)
 })
 
 test('audit', async () => {

@@ -285,20 +285,7 @@ export class Cli {
 		this.rawLogger.timeEnd(label)
 		this.rawLogger.info()
 
-		label = '- Time, step5'
-		this.rawLogger.time(label)
-		try {
-			const step5 = new ScanStep5({
-				db: this.db,
-				auditOutPath: this.config.auditOutPath,
-				logger: this.logger,
-				verbose,
-			})
-			await step5.run()
-		} catch (e) {
-			throw e
-		}
-		this.rawLogger.timeEnd(label)
+		this.logger.info(chalk`{blue Run 'audit' to investigate any findings.}`)
 
 		if (errors.length) {
 			this.rawLogger.info()

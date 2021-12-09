@@ -1,7 +1,7 @@
 __default:
 	@ cat ./Makefile
 
-VERSION=0.0.4
+VERSION=0.0.5
 IMAGE_TAG=khueue/sin:$(VERSION)
 
 install:
