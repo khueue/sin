@@ -105,18 +105,19 @@ Commands:
    available CPU.
 
 
-# Rule Engine
+# Auditing
 
 The `sin.ts audit` tool gathers a report according to the following:
 
 -  Fetch all files (from the database) that **might mention** licenses in
-   any way.
--  When a license file is found (e.g. `LICENSE`), and it mentions
-   **only accepted** licenses, then that whole folder (including subfolders)
-   is excluded.  The idea is: "this project seems to have an okay license,
-   allow it."
--  When a non-license file is found, and it mentions **only accepted** licenses,
-   exclude it.
+   any way:
+   -  When a license file is found (e.g. `LICENSE`), and it mentions
+      **only accepted** licenses, then that whole folder (including subfolders)
+      is excluded.  The idea is: "this project seems to have an okay license,
+      allow it."
+   -  When a non-license file is found, and it mentions **only accepted**
+      licenses, exclude it.
+-  The remainder is a set of files that needs looking into.
 
 ## Automatic Acceptance
 
@@ -136,6 +137,6 @@ and take decisions from there. For these situations, files can be marked as
 
 Marking as "accepted" essentially sets a flag in the database for a particular
 file, omitting it from future audits. Important to know is that if a file
-that has been marked as accepted changes, that flag will be removed so that
+that has been marked as accepted _changes_, that flag will be removed so that
 the file can start showing up in reports again. It is possible to revert
 accepts by running `sin.ts unaccept`.
