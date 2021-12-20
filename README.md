@@ -39,6 +39,8 @@ Docker images available on Docker Hub:
 
 ## Input to Sin
 
+Sin runs in a docker container, and uses the following directories:
+
 -  `/data/src`. Sin assumes that this dir contains all files that you wish to
    scan, **including installed dependencies**. Make sure everything is
    installed and available in this dir. Can be mounted read-only. You could
