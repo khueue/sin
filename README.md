@@ -3,6 +3,8 @@
 ![release](https://img.shields.io/badge/release-0.0.5-green)
 ![coverage](https://img.shields.io/badge/coverage-88%25-green)
 
+_Keep track of sinful license usage._
+
 Sin (**s**ource **in**ventory) collects **license information** from all input
 files using [ScanCode](https://github.com/nexB/scancode-toolkit) and saves the
 results to a local database for incremental updates and further analysis. Sin
