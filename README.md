@@ -64,7 +64,7 @@ Make sure the dirs to be mounted exist on the host:
 
 ```bash
 # For the sake of the example, we create this. In a real world scenario, this
-# might be the root of your source code.
+# might be the (existing) root of your source code.
 mkdir -p ./sin-data/src
 
 # Database will be stored here.
