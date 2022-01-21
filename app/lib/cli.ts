@@ -66,7 +66,8 @@ export class Cli {
 				[
 					`File pattern (glob) to scan`,
 					`Example: my-repo/node_modules/glob/LICENSE`,
-					`Example: 'my-repo/node_modules/g*' (use quotes to avoid any bash expansion)`,
+					`Example: 'my-repo/**' (quotes avoid any bash expansion)`,
+					`Example: 'my-repo/node_modules/g*'`,
 				].join('\n'),
 				'**',
 			)
