@@ -60,6 +60,6 @@ ENV NODE_OPTIONS="--max_old_space_size=4096"
 # See: https://gist.github.com/scmx/242caa249b0ea343e2588adea14479e6
 RUN apt install -y bash-completion
 RUN echo '[[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && . /usr/share/bash-completion/bash_completion' >> ~/.bashrc
-RUN echo 'export PS1="\n🐳 \[\033[1;36m\]sin \[\033[1;34m\]\$PWD\[\033[0;35m\]\n\[\033[1;36m\]$ \[\033[0m\]"' >> ~/.bashrc
+RUN echo 'export PS1="\n🐳 \[\033[1;36m\]sin.ts \[\033[1;34m\]\$PWD\[\033[0;35m\]\n\[\033[1;36m\]$ \[\033[0m\]"' >> ~/.bashrc
 
 ENTRYPOINT [ "bash" ]

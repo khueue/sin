@@ -62,26 +62,32 @@ Sin runs in a docker container, and uses the following directories:
 
 Make sure the dirs to be mounted exist on the host:
 
-```
-mkdir -p ./data/db
-mkdir -p ./data/src
-mkdir -p ./data/tmp
+```bash
+# For the sake of the example, we create this. In a real world scenario, this
+# might be the root of your source code.
+mkdir -p ./sin-data/src
+
+# Database will be stored here.
+mkdir -p ./sin-data/db
+
+# All temp files will be stored here.
+mkdir -p ./sin-data/tmp
 ```
 
 Then run a container with Sin:
 
-```
+```bash
 docker run --interactive --tty --rm --init \
-   --mount type="bind",source="$(PWD)/data/db",target="/data/db",consistency="delegated" \
-   --mount type="bind",source="$(PWD)/data/src",target="/data/src",readonly \
-   --mount type="bind",source="$(PWD)/data/tmp",target="/data/tmp",consistency="delegated" \
+   --mount type="bind",source="$(PWD)/sin-data/db",target="/data/db",consistency="delegated" \
+   --mount type="bind",source="$(PWD)/sin-data/tmp",target="/data/tmp",consistency="delegated" \
+   --mount type="bind",source="$(PWD)/sin-data/src",target="/data/src",readonly \
    khueue/sin:0.0.5
 ```
 
 The above command will place you inside a bash shell, allowing you to run
 the tool, `sin.ts`:
 
-```
+```bash
 $ sin.ts
 Usage: sin.ts [options] [command]
 

@@ -117,9 +117,6 @@ export class Cli {
 			.argument('<reason>', 'Reason for accepting')
 			.action((pattern: string, reason: string) => {
 				this.accept(pattern, reason)
-				this.logger.info(
-					chalk`{magenta NOTE: Don't forget to run 'db upload' when you're done!}`,
-				)
 			})
 
 		this.program
@@ -130,9 +127,6 @@ export class Cli {
 			.argument('<pattern>', descPattern)
 			.action((pattern: string) => {
 				this.unaccept(pattern)
-				this.logger.info(
-					chalk`{magenta NOTE: Don't forget to run 'db upload' when you're done!}`,
-				)
 			})
 
 		const licenses = this.program
