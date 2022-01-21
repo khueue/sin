@@ -3,6 +3,7 @@ __default:
 
 SHELL=/usr/bin/env bash
 
+# NOTE: Search through the repo for mentions of previous version when bumping.
 VERSION=0.0.6
 IMAGE_TAG=khueue/sin:$(VERSION)
 
