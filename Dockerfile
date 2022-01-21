@@ -31,15 +31,6 @@ RUN yarn global add ts-node@10.4.0
 RUN apt install -y less
 RUN apt install -y sqlite3
 
-# UPGRADE_POINT.
-# See: https://github.com/aws/aws-cli/blob/v2/CHANGELOG.rst
-ENV AWSCLI_VERSION=2.4.0
-RUN curl --location https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWSCLI_VERSION}.zip \
-		--output ./awscli.zip \
-	&& unzip ./awscli.zip \
-	&& ./aws/install \
-	&& rm -rf ./awscli.zip
-
 WORKDIR /app
 
 COPY ./app/package.json ./
