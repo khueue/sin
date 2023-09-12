@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node-transpile-only
 
-import chalk from 'chalk'
+// import chalk from 'chalk'
 import { Command } from 'commander'
 import { mkdir, writeFile } from 'fs/promises'
 import { basename, dirname } from 'path'
@@ -200,7 +200,7 @@ export class Cli {
 
 	async scan(scanPattern: string, options: any) {
 		const delimiter = ''.padEnd(72, '=')
-		this.rawLogger.info(chalk`{blue ${delimiter}}`)
+		// this.rawLogger.info(chalk`{blue ${delimiter}}`)
 		this.rawLogger.info()
 
 		const errors: Error[] = []
@@ -224,26 +224,26 @@ export class Cli {
 		this.rawLogger.timeEnd(label)
 		this.rawLogger.info()
 
-		label = '- Time, step2'
-		this.rawLogger.time(label)
-		try {
-			const step2 = new ScanStep2({
-				dirtyRoot: this.config.dirtyRoot,
-				logger: this.logger,
-				skipExtractArchives: this.config.skipExtractArchives ?? false,
-			})
-			await step2.run()
-		} catch (e: any) {
-			errors.push(e)
-			this.logger.error(
-				chalk`{red STEP 2 failed with errors, continuing anyway.}`,
-			)
-			this.logger.error(
-				chalk`{red This probably just means that a few archives couldn't be decompressed.}`,
-			)
-		}
-		this.rawLogger.timeEnd(label)
-		this.rawLogger.info()
+		// label = '- Time, step2'
+		// this.rawLogger.time(label)
+		// try {
+		// 	const step2 = new ScanStep2({
+		// 		dirtyRoot: this.config.dirtyRoot,
+		// 		logger: this.logger,
+		// 		skipExtractArchives: this.config.skipExtractArchives ?? false,
+		// 	})
+		// 	await step2.run()
+		// } catch (e: any) {
+		// 	errors.push(e)
+		// 	this.logger.error(
+		// 		// chalk`{red STEP 2 failed with errors, continuing anyway.}`,
+		// 	)
+		// 	this.logger.error(
+		// 		// chalk`{red This probably just means that a few archives couldn't be decompressed.}`,
+		// 	)
+		// }
+		// this.rawLogger.timeEnd(label)
+		// this.rawLogger.info()
 
 		label = '- Time, step3'
 		this.rawLogger.time(label)
@@ -258,7 +258,7 @@ export class Cli {
 		} catch (e: any) {
 			errors.push(e)
 			this.logger.error(
-				chalk`{red STEP 3 failed with errors, continuing anyway.}`,
+				// chalk`{red STEP 3 failed with errors, continuing anyway.}`,
 			)
 		}
 		this.rawLogger.timeEnd(label)
@@ -280,7 +280,7 @@ export class Cli {
 		this.rawLogger.timeEnd(label)
 		this.rawLogger.info()
 
-		this.logger.info(chalk`{blue Run 'audit' to investigate any findings.}`)
+		// this.logger.info(chalk`{blue Run 'audit' to investigate any findings.}`)
 
 		if (errors.length) {
 			this.rawLogger.info()
@@ -328,11 +328,11 @@ export class Cli {
 			}
 			return
 		}
-		this.rawLogger.info(chalk`{blue ${''.padEnd(72, '>')}}`)
+		// this.rawLogger.info(chalk`{blue ${''.padEnd(72, '>')}}`)
 		this.rawLogger.info()
 		this.rawLogger.info(row.content_text?.trim())
 		this.rawLogger.info()
-		this.rawLogger.info(chalk`{blue ${''.padEnd(72, '<')}}`)
+		// this.rawLogger.info(chalk`{blue ${''.padEnd(72, '<')}}`)
 	}
 
 	async listAccepts(options: any) {

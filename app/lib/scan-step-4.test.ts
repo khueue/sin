@@ -80,7 +80,7 @@ test('save to db, some old', async () => {
 		}
 		const row: AnalysedFileRow = stmt.get({
 			file_path: reportEntry.path,
-		})
+		}) as any
 		const dirtyFile = findDirtyFile(dirtyFiles, reportEntry.path)
 		// Should be in database with correct hash.
 		expect(row.content_sha256 === reportEntry.sha256).toBeTruthy()

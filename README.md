@@ -1,6 +1,14 @@
+Stuff:
+
+-  chalk is commented out (TS issues)
+-  tests don't work
+-  extractcode doesn't exist
+-  license structure has changed (also no longer gives category?)
+
+
 # Sin
 
-![release](https://img.shields.io/badge/release-0.0.6-green)
+![release](https://img.shields.io/badge/release-0.0.7-green)
 ![coverage](https://img.shields.io/badge/coverage-88%25-green)
 
 _Keep track of sinful license usage._
@@ -81,7 +89,7 @@ docker run --interactive --tty --rm --init \
    --mount type="bind",source="$(PWD)/sin-data/db",target="/data/db",consistency="delegated" \
    --mount type="bind",source="$(PWD)/sin-data/tmp",target="/data/tmp",consistency="delegated" \
    --mount type="bind",source="$(PWD)/sin-data/src",target="/data/src",readonly \
-   khueue/sin:0.0.6
+   khueue/sin:0.0.7
 ```
 
 The above command will place you inside a bash shell, allowing you to run

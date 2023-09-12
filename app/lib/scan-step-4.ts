@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+// import chalk from 'chalk'
 import { existsSync } from 'fs'
 import { readFile } from 'fs/promises'
 import type { LocalDatabase } from './db'
@@ -34,7 +34,7 @@ export class ScanStep4 {
 	}
 
 	async run() {
-		this.logger.info(chalk`{yellow === STEP 4: Save results to database}`)
+		// this.logger.info(chalk`{yellow === STEP 4: Save results to database}`)
 
 		if (!existsSync(this.scanCodeOutPath)) {
 			this.logger.info(`Nothing to be done (no ScanCode report found).`)
@@ -66,15 +66,16 @@ export class ScanStep4 {
 				contentSha256: scannedFile.sha256 ?? SHA256_EMPTY_STRING,
 			} as AnalysedFile
 
-			if (scannedFile.licenses.length) {
+			if (scannedFile.license_detections?.length) {
 				// Gather and de-duplicate license findings.
 				const licensesMap: Record<string, LicenseInfo> = {}
-				for (const foundLicense of scannedFile.licenses) {
-					if (!licensesMap[foundLicense.name]) {
+				for (const foundLicense of scannedFile.license_detections) {
+					if (!licensesMap[foundLicense.license_expression]) {
 						// Extract subset of details.
-						licensesMap[foundLicense.name] = {
-							name: foundLicense.name,
-							category: foundLicense.category,
+						licensesMap[foundLicense.license_expression] = {
+							license_expression: foundLicense.license_expression,
+							// name: foundLicense.name,
+							// category: foundLicense.category,
 						}
 					}
 				}

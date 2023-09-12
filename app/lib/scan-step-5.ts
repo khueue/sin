@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+// import chalk from 'chalk'
 import { mkdir, readFile, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { dirname } from 'path'
@@ -29,7 +29,7 @@ export class ScanStep5 {
 	}
 
 	async run() {
-		this.logger.info(chalk`{yellow === STEP 5: Gather suspicious findings}`)
+		// this.logger.info(chalk`{yellow === STEP 5: Gather suspicious findings}`)
 
 		this.logger.info(`Analysing suspicious files in database ...`)
 		const files = this.db.fetchAnalysedFilesNeedingInvestigation()

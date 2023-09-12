@@ -1,6 +1,6 @@
 import type { Database as DatabaseT, Options, Statement } from 'better-sqlite3'
 import Database from 'better-sqlite3'
-import chalk from 'chalk'
+// import chalk from 'chalk'
 import { existsSync } from 'fs'
 import type { AnalysedFile, AnalysedFileRow, BasicLogger } from './types'
 
@@ -24,7 +24,7 @@ export class LocalDatabase {
 
 		if (!existsSync(config.sqlitePath)) {
 			this.logger.info(
-				chalk`{magenta Database ${config.sqlitePath} does not exist, creating it.}`,
+				// chalk`{magenta Database ${config.sqlitePath} does not exist, creating it.}`,
 			)
 		}
 		const opts: Options = {}

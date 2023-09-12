@@ -3,8 +3,9 @@ __default:
 
 SHELL=/usr/bin/env bash
 
+# UPGRADE_POINT.
 # NOTE: Search through the repo for mentions of previous version when bumping.
-VERSION=0.0.6
+VERSION=0.0.7
 IMAGE_TAG=khueue/sin:$(VERSION)
 
 install:
@@ -22,6 +23,8 @@ coverage:
 release: build_image
 	docker login --username khueue
 	docker push $(IMAGE_TAG)
+
+# export DOCKER_DEFAULT_PLATFORM := linux/amd64
 
 cmd := bash
 shell: create_dirs build_image

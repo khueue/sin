@@ -42,10 +42,10 @@ export function testLogger() {
 
 export async function createTestConfig() {
 	const testId = [
-		basename(expect.getState().testPath),
-		expect
+		basename(expect.getState().testPath || ''),
+		(expect
 			.getState()
-			.currentTestName.toLowerCase()
+			.currentTestName || '').toLowerCase()
 			.replace(/[^0-9a-z]+/g, '-'),
 	].join('-')
 	const sessionDir = `${testRoot}/${testId}`

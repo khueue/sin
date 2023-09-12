@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.7 (2023-XXXXX)
+
+-  WIP.
+
 ## 0.0.6 (2022-01-21)
 
 -  Remove nonsensical print after running accept/unaccept commands.

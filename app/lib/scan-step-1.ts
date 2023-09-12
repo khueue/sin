@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+// import chalk from 'chalk'
 import { createHash } from 'crypto'
 import { copyFile, lstat, mkdir, readFile } from 'fs/promises'
 import { dirname } from 'path'
@@ -33,12 +33,12 @@ export class ScanStep1 {
 
 	async run(scanPattern: string) {
 		this.logger.info(
-			chalk`{yellow === STEP 1: Collect dirty files for scanning}`,
+			// chalk`{yellow === STEP 1: Collect dirty files for scanning}`,
 		)
 
 		if (this.skipIsDirtyCheck) {
 			this.logger.info(
-				chalk`{red SKIPPING loading all previously analysed files from database.}`,
+				// chalk`{red SKIPPING loading all previously analysed files from database.}`,
 			)
 		} else {
 			this.logger.info(

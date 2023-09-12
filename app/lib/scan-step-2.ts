@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+// import chalk from 'chalk'
 import { existsSync } from 'fs'
 import { $ } from 'zx'
 import type { BasicLogger } from './types'
@@ -25,7 +25,7 @@ export class ScanStep2 {
 
 	async run() {
 		this.logger.info(
-			chalk`{yellow === STEP 2: Extract any archives among dirty files}`,
+			// chalk`{yellow === STEP 2: Extract any archives among dirty files}`,
 		)
 
 		if (!existsSync(this.dirtyRoot)) {
@@ -33,7 +33,7 @@ export class ScanStep2 {
 			return
 		}
 		if (this.skipExtractArchives) {
-			this.logger.info(chalk`{red SKIPPING extracting archives.}`)
+			// this.logger.info(chalk`{red SKIPPING extracting archives.}`)
 			return
 		}
 

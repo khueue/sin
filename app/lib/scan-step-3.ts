@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+// import chalk from 'chalk'
 import { existsSync } from 'fs'
 import { mkdir } from 'fs/promises'
 import { cpus } from 'os'
@@ -27,7 +27,7 @@ export class ScanStep3 {
 	}
 
 	async run() {
-		this.logger.info(chalk`{yellow === STEP 3: Run ScanCode on dirty files}`)
+		// this.logger.info(chalk`{yellow === STEP 3: Run ScanCode on dirty files}`)
 
 		if (!existsSync(this.dirtyRoot)) {
 			this.logger.info(`Nothing to be done (no dirty files).`)
@@ -47,6 +47,8 @@ export class ScanStep3 {
 			'--license', // Gives license information.
 			'--classify', // Gives is_legal flag.
 			'--json',
+			// '-clpieu',
+			// '--json-pp',
 			this.scanCodeOutPath,
 			this.dirtyRoot,
 		]
