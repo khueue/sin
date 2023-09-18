@@ -34,11 +34,13 @@ export class ScanStep1 {
 	async run(scanPattern: string) {
 		this.logger.info(
 			// chalk`{yellow === STEP 1: Collect dirty files for scanning}`,
+			`=== STEP 1: Collect dirty files for scanning`,
 		)
 
 		if (this.skipIsDirtyCheck) {
 			this.logger.info(
 				// chalk`{red SKIPPING loading all previously analysed files from database.}`,
+				`SKIPPING loading all previously analysed files from database.`,
 			)
 		} else {
 			this.logger.info(

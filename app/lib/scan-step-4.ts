@@ -35,6 +35,7 @@ export class ScanStep4 {
 
 	async run() {
 		// this.logger.info(chalk`{yellow === STEP 4: Save results to database}`)
+		this.logger.info(`=== STEP 4: Save results to database`)
 
 		if (!existsSync(this.scanCodeOutPath)) {
 			this.logger.info(`Nothing to be done (no ScanCode report found).`)
@@ -72,6 +73,7 @@ export class ScanStep4 {
 				for (const foundLicense of scannedFile.license_detections) {
 					if (!licensesMap[foundLicense.license_expression]) {
 						// Extract subset of details.
+						// @todo Category is no longer set by ScanCode.
 						licensesMap[foundLicense.license_expression] = {
 							license_expression: foundLicense.license_expression,
 							// name: foundLicense.name,

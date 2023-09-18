@@ -28,6 +28,7 @@ export class ScanStep3 {
 
 	async run() {
 		// this.logger.info(chalk`{yellow === STEP 3: Run ScanCode on dirty files}`)
+		this.logger.info(`=== STEP 3: Run ScanCode on dirty files`)
 
 		if (!existsSync(this.dirtyRoot)) {
 			this.logger.info(`Nothing to be done (no dirty files).`)
@@ -46,9 +47,7 @@ export class ScanStep3 {
 			'--info', // Gives sha256 of file contents.
 			'--license', // Gives license information.
 			'--classify', // Gives is_legal flag.
-			'--json',
-			// '-clpieu',
-			// '--json-pp',
+			'--json-pp',
 			this.scanCodeOutPath,
 			this.dirtyRoot,
 		]

@@ -30,6 +30,7 @@ export class ScanStep5 {
 
 	async run() {
 		// this.logger.info(chalk`{yellow === STEP 5: Gather suspicious findings}`)
+		this.logger.info(`=== STEP 5: Gather suspicious findings`)
 
 		this.logger.info(`Analysing suspicious files in database ...`)
 		const files = this.db.fetchAnalysedFilesNeedingInvestigation()
@@ -70,9 +71,10 @@ export class ScanStep5 {
 			const row = stmt.get({
 				file_path: node.filePath,
 			}) as AnalysedFileRow
-			const pathToScan = `${tmpdir()}/tmp-content-file`
+			const tempDir = tmpdir()
+			const pathToScan = `${tempDir}/tmp-content-file`
 			await writeFile(pathToScan, row.content_text ?? '', 'utf-8')
-			const detailedReportPath = `${tmpdir()}/tmp-scancode.json`
+			const detailedReportPath = `${tempDir}/tmp-scancode.json`
 			const cmd = [
 				'scancode',
 				'--quiet',
@@ -89,7 +91,8 @@ export class ScanStep5 {
 			const detailedReport = JSON.parse(detailedReportJson)
 			const nodeAsAny = node as any
 			for (const scannedFile of detailedReport.files) {
-				if (scannedFile.path === pathToScan) {
+				// ScanCode seems to omit leading slash even with '--full-root'.
+				if (`/${scannedFile.path}` === pathToScan) {
 					delete scannedFile.path // Misleading (temp path).
 					nodeAsAny.scanCodeReport = scannedFile
 					break

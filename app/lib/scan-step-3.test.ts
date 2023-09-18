@@ -54,7 +54,7 @@ test('scan dirty files', async () => {
 	const scannedFiles: ScanCodeEntry[] = JSON.parse(reportContents).files
 	for (const dirtyFile of initialDirtyFiles) {
 		const scanEntry = getScanCodeEntry(scannedFiles, dirtyFile.filePath)
-		const numLicenseFindings = Object.keys(scanEntry.licenses).length
+		const numLicenseFindings = scanEntry.license_detections.length
 		if (dirtyFile.shouldHaveLicenseFindings) {
 			expect(numLicenseFindings).toBeTruthy()
 		} else {

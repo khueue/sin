@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.0.7 (2023-XXXXX)
+## 1.0.0 (2023-XXXXX)
 
 -  WIP.
 

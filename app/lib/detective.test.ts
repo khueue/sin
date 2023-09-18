@@ -2,7 +2,7 @@ import { Detective } from './detective'
 import type { AnalysedFile } from './types'
 
 test('innocent files', async () => {
-	const detective = new Detective(['Ruby License'], ['Permissive'])
+	const detective = new Detective(['ruby'], [])
 
 	let file: AnalysedFile
 	let suspicious: boolean
@@ -17,13 +17,11 @@ test('innocent files', async () => {
 		filePath: 'some/file.txt',
 		licenses: [
 			{
-				name: 'Ruby License',
-				category: '',
+				license_expression: 'ruby',
 			},
-			{
-				name: '',
-				category: 'Permissive',
-			},
+			// {
+			// 	name: '',
+			// },
 		],
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
@@ -33,8 +31,7 @@ test('innocent files', async () => {
 		filePath: 'some/file.txt',
 		licenses: [
 			{
-				name: 'GPL',
-				category: '',
+				license_expression: 'gpl-1.0',
 			},
 		],
 		currentAcceptedAt: new Date(),
@@ -44,7 +41,7 @@ test('innocent files', async () => {
 })
 
 test('suspicious files', async () => {
-	const detective = new Detective(['Ruby License'], ['Permissive'])
+	const detective = new Detective(['ruby'], [])
 
 	let file: AnalysedFile
 	let suspicious: boolean
@@ -53,12 +50,7 @@ test('suspicious files', async () => {
 		filePath: 'some/file.txt',
 		licenses: [
 			{
-				name: 'What Is This License',
-				category: '',
-			},
-			{
-				name: '',
-				category: 'Permissive',
+				license_expression: 'What Is This License',
 			},
 		],
 	}

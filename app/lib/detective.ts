@@ -32,12 +32,13 @@ export class Detective {
 	}
 
 	isAcceptedLicense(license: LicenseInfo) {
-		if (this.allowedSpecificLicenses.includes(license.name)) {
+		if (this.allowedSpecificLicenses.includes(license.license_expression)) {
 			return true
 		}
-		if (this.allowedLicenseCategories.includes(license.category)) {
-			return true
-		}
+		// @todo Category is no longer stated by ScanCode?
+		// if (this.allowedLicenseCategories.includes(license.category)) {
+		// 	return true
+		// }
 		return false
 	}
 }

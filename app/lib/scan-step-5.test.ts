@@ -13,8 +13,8 @@ test('audit', async () => {
 		sqlitePath: testConf.dbPath,
 		logger,
 	})
-	db.allowedSpecificLicenses = ['Ruby License']
-	db.allowedLicenseCategories = ['Permissive']
+	db.allowedSpecificLicenses = ['ruby', 'mit', 'bsd-new']
+	db.allowedLicenseCategories = []
 
 	const dbFiles: AnalysedFile[] = [
 		{
@@ -24,8 +24,8 @@ test('audit', async () => {
 			`,
 			licenses: [
 				{
-					name: 'Ruby License',
-					category: '',
+					license_expression: 'ruby',
+					// category: '',
 				},
 			],
 		},
@@ -37,12 +37,12 @@ test('audit', async () => {
 			`,
 			licenses: [
 				{
-					name: 'GPL',
-					category: 'Copyleft',
+					license_expression: 'gpl-1.0',
+					// category: 'Copyleft',
 				},
 				{
-					name: 'MIT',
-					category: 'Permissive',
+					license_expression: 'mit',
+					// category: 'Permissive',
 				},
 			],
 		},
@@ -54,12 +54,12 @@ test('audit', async () => {
 			`,
 			licenses: [
 				{
-					name: 'MIT',
-					category: 'Permissive',
+					license_expression: 'mit',
+					// category: 'Permissive',
 				},
 				{
-					name: 'BSD',
-					category: 'Permissive',
+					license_expression: 'bsd-new',
+					// category: 'Permissive',
 				},
 			],
 		},
@@ -85,10 +85,10 @@ test('audit', async () => {
 
 	const detailedReport = auditTree.root['a1']['with-gpl.txt'].scanCodeReport
 
-	const gplFinding = detailedReport.licenses[0]
+	const gplFinding = detailedReport.license_detections[0].matches[0]
 	expect(gplFinding.matched_text).toContain('GPL License // line 2')
 
-	const mitFinding = detailedReport.licenses[1]
+	const mitFinding = detailedReport.license_detections[0].matches[1]
 	expect(mitFinding.matched_text).toContain('MIT License // line 3')
 })
 

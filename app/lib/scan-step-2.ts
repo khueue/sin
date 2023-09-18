@@ -26,6 +26,7 @@ export class ScanStep2 {
 	async run() {
 		this.logger.info(
 			// chalk`{yellow === STEP 2: Extract any archives among dirty files}`,
+			`=== STEP 2: Extract any archives among dirty files`,
 		)
 
 		if (!existsSync(this.dirtyRoot)) {
@@ -34,6 +35,7 @@ export class ScanStep2 {
 		}
 		if (this.skipExtractArchives) {
 			// this.logger.info(chalk`{red SKIPPING extracting archives.}`)
+			this.logger.info(`SKIPPING extracting archives.`)
 			return
 		}
 

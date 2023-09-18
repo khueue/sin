@@ -51,7 +51,7 @@ test('non-empty tree', () => {
 })
 
 test('prune recursive under okay license file', () => {
-	const detective = new Detective(['Ruby License'], [])
+	const detective = new Detective(['ruby'], [])
 	const tree = new FileTree([], detective)
 	tree.root = {
 		a1: {
@@ -61,8 +61,8 @@ test('prune recursive under okay license file', () => {
 					isLegalDocument: true,
 					licenses: [
 						{
-							name: 'Ruby License',
-							category: '',
+							license_expression: 'ruby',
+							// category: 'some category',
 						},
 					],
 				},
@@ -123,7 +123,7 @@ test('prune empty nodes', () => {
 })
 
 test('prune individually accepted', () => {
-	const detective = new Detective(['Ruby License'], ['Permissive'])
+	const detective = new Detective(['ruby'], [])
 	const tree = new FileTree([], detective)
 	tree.root = {
 		a1: {
@@ -135,8 +135,8 @@ test('prune individually accepted', () => {
 					currentAcceptedAt: new Date(),
 					licenses: [
 						{
-							name: 'some license',
-							category: 'some category',
+							license_expression: 'gpl-1.0',
+							// category: 'some category',
 						},
 					],
 				} as AnalysedFile,
@@ -150,13 +150,12 @@ test('prune individually accepted', () => {
 				filePath: 'a1/file3',
 				licenses: [
 					{
-						name: 'Ruby License',
-						category: '',
+						license_expression: 'ruby',
 					},
-					{
-						name: '',
-						category: 'Permissive',
-					},
+					// {
+					// 	name: '',
+					// 	category: 'Permissive',
+					// },
 				],
 			} as AnalysedFile,
 		},
@@ -165,8 +164,8 @@ test('prune individually accepted', () => {
 			filePath: 'file4',
 			licenses: [
 				{
-					name: 'some license',
-					category: '',
+					license_expression: 'gpl-2.0',
+					// category: '',
 				},
 			],
 		} as AnalysedFile,
@@ -181,8 +180,8 @@ test('prune individually accepted', () => {
 			filePath: 'file4',
 			licenses: [
 				{
-					name: 'some license',
-					category: '',
+					license_expression: 'gpl-2.0',
+					// category: '',
 				},
 			],
 		} as AnalysedFile,

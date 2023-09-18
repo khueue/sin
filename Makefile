@@ -5,7 +5,7 @@ SHELL=/usr/bin/env bash
 
 # UPGRADE_POINT.
 # NOTE: Search through the repo for mentions of previous version when bumping.
-VERSION=0.0.7
+VERSION=1.0.0
 IMAGE_TAG=khueue/sin:$(VERSION)
 
 install:
