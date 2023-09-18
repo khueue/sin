@@ -1,8 +1,13 @@
 # Changelog
 
-## 1.0.0 (2023-XXXXX)
+## 1.0.0 (2023-XXXXX) (UNRELEASED)
 
--  WIP.
+-  BREAKING: extractcode step is disabled, because it doesn't seem to work (why?).
+-  BREAKING: License category is no longer stated by ScanCode, so we only work
+   with specific license accepts now.
+-  Chalk is disabled due to issues with TS/imports.
+-  @todo Fix issue where "mit AND bsd" shows up even though both are accepted
+   individually.
 
 ## 0.0.6 (2022-01-21)
 

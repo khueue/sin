@@ -1,11 +1,3 @@
-Stuff:
-
--  chalk is commented out (TS issues)
--  tests don't work
--  Extractcode doesn't exist
--  license structure has changed (also no longer gives category?)
-
-
 # Sin
 
 ![release](https://img.shields.io/badge/release-1.0.0-green)
@@ -141,13 +133,14 @@ The `sin.ts audit` tool gathers a report according to the following:
 
 The engine is configured to accept licenses using two settings:
 
--  By category, such as "permissive" licenses.
 -  By name, allowing specific licenses such as "Ruby License".
 
-These globally accepted licenses are stored in the database, applied on-the-fly
-on every `sin.ts audit`, and managed by `sin.ts licenses`.
+These acceptances are stored in the database, applied on-the-fly on every
+`sin.ts audit`, and managed by `sin.ts licenses`. This means that it's
+simple to go back and forth with accepting and unaccepting licenses and then
+re-auditing as needed.
 
-Refer to "Short name" and "Category" in:
+Refer to "Key" in:
 
 -  https://scancode-licensedb.aboutcode.org/
 
