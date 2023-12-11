@@ -9,9 +9,10 @@
 		"forceConsistentCasingInFileNames": true,
 		"importHelpers": false,
 		"isolatedModules": true,
-		"lib": ["esnext"],
-		"module": "commonjs",
-		"moduleResolution": "node",
+		"lib": ["ESNext"],
+		"module": "ESNext",
+		"moduleResolution": "Node",
+		"target": "ESNext",
 		"noEmitOnError": true,
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitAny": true,
@@ -24,8 +25,7 @@
 		"skipLibCheck": true,
 		"strict": true,
 		"strictNullChecks": true,
-		"strictPropertyInitialization": true,
-		"target": "esnext"
+		"strictPropertyInitialization": true
 	},
 	"include": ["./**/*.ts"]
 }

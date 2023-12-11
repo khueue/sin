@@ -1,16 +1,18 @@
-import { LocalDatabase } from './db'
-import { ScanStep4 } from './scan-step-4'
+import t from 'tap'
+
+import { LocalDatabase } from './db.js'
+import { ScanStep4 } from './scan-step-4.js'
 import {
 	createTestConfig,
 	FileStub,
 	prepareDirtyFiles,
 	testLogger,
 	writeFileForce,
-} from './test-utils'
-import type { AnalysedFileRow, ScanCodeEntry } from './types'
+} from './test-utils.js'
+import type { AnalysedFileRow, ScanCodeEntry } from './types.js'
 
-test('save to db, some old', async () => {
-	const testConf = await createTestConfig()
+t.test('save to db, some old', async (t) => {
+	const testConf = await createTestConfig(t.fullname)
 	const logger = testLogger()
 
 	const db = new LocalDatabase({
@@ -83,21 +85,21 @@ test('save to db, some old', async () => {
 		}) as any
 		const dirtyFile = findDirtyFile(dirtyFiles, reportEntry.path)
 		// Should be in database with correct hash.
-		expect(row.content_sha256 === reportEntry.sha256).toBeTruthy()
+		t.equal(row.content_sha256, reportEntry.sha256)
 		// Should move current reason to previous if it was already in db.
 		if (dirtyFile.inDb) {
-			expect(row.previous_accepted_reason).toBe('old_current_accepted_reason')
+			t.match(row.previous_accepted_reason, 'old_current_accepted_reason')
 		}
 		// Should have cleared out current reason.
-		expect(row.current_accepted_reason).toBeFalsy()
-		expect(row.current_accepted_at).toBeFalsy()
+		t.notOk(row.current_accepted_reason)
+		t.notOk(row.current_accepted_at)
 		// Should save file contents along with licenses.
 		if (dirtyFile.shouldHaveLicenseFindings) {
-			expect(row.licenses).toBeTruthy()
-			expect(row.content_text).toBe(dirtyFile.contents)
+			t.ok(row.licenses)
+			t.match(row.content_text, dirtyFile.contents)
 		} else {
-			expect(row.licenses).toBeFalsy()
-			expect(row.content_text).toBeFalsy()
+			t.notOk(row.licenses)
+			t.notOk(row.content_text)
 		}
 	}
 })

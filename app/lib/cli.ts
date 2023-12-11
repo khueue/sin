@@ -1,18 +1,17 @@
-#!/usr/bin/env ts-node-transpile-only
-
-// import chalk from 'chalk'
+import chalk from 'chalk'
 import { Command } from 'commander'
 import { mkdir, writeFile } from 'fs/promises'
 import { basename, dirname } from 'path'
-import type { LocalDatabase } from './db'
-import { Detective } from './detective'
-import { ScanStep1 } from './scan-step-1'
-// import { ScanStep2 } from './scan-step-2'
-import { ScanStep3 } from './scan-step-3'
-import { ScanStep4 } from './scan-step-4'
-import { ScanStep5 } from './scan-step-5'
-import { FileTree } from './tree'
-import type { AnalysedFile, AnalysedFileRow, BasicLogger } from './types'
+
+import type { LocalDatabase } from './db.js'
+import { Detective } from './detective.js'
+import { ScanStep1 } from './scan-step-1.js'
+// import { ScanStep2 } from './scan-step-2.js'
+import { ScanStep3 } from './scan-step-3.js'
+import { ScanStep4 } from './scan-step-4.js'
+import { ScanStep5 } from './scan-step-5.js'
+import { FileTree } from './tree.js'
+import type { AnalysedFile, AnalysedFileRow, BasicLogger } from './types.js'
 
 interface Config {
 	db: LocalDatabase
@@ -200,8 +199,7 @@ export class Cli {
 
 	async scan(scanPattern: string, options: any) {
 		const delimiter = ''.padEnd(72, '=')
-		// this.rawLogger.info(chalk`{blue ${delimiter}}`)
-		this.rawLogger.info(`${delimiter}`)
+		this.rawLogger.info(chalk.blue(delimiter))
 		this.rawLogger.info()
 
 		const errors: Error[] = []
@@ -259,8 +257,7 @@ export class Cli {
 		} catch (e: any) {
 			errors.push(e)
 			this.logger.error(
-				// chalk`{red STEP 3 failed with errors, continuing anyway.}`,
-				`STEP 3 failed with errors, continuing anyway.`,
+				chalk.red('STEP 3 failed with errors, continuing anyway.'),
 			)
 		}
 		this.rawLogger.timeEnd(label)
@@ -282,8 +279,7 @@ export class Cli {
 		this.rawLogger.timeEnd(label)
 		this.rawLogger.info()
 
-		// this.logger.info(chalk`{blue Run 'audit' to investigate any findings.}`)
-		this.logger.info(`Run 'audit' to investigate any findings.`)
+		this.logger.info(chalk.blue(`Run 'audit' to investigate any findings.`))
 
 		if (errors.length) {
 			this.rawLogger.info()
@@ -331,13 +327,11 @@ export class Cli {
 			}
 			return
 		}
-		// this.rawLogger.info(chalk`{blue ${''.padEnd(72, '>')}}`)
-		this.rawLogger.info(`${''.padEnd(72, '>')}`)
+		this.rawLogger.info(chalk.blue(`${''.padEnd(72, '>')}`))
 		this.rawLogger.info()
 		this.rawLogger.info(row.content_text?.trim())
 		this.rawLogger.info()
-		// this.rawLogger.info(chalk`{blue ${''.padEnd(72, '<')}}`)
-		this.rawLogger.info(`${''.padEnd(72, '<')}`)
+		this.rawLogger.info(chalk.blue(`${''.padEnd(72, '<')}`))
 	}
 
 	async listAccepts(options: any) {

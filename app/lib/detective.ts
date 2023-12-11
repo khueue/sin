@@ -1,4 +1,4 @@
-import type { AnalysedFile, LicenseInfo } from './types'
+import type { AnalysedFile, LicenseInfo } from './types.js'
 
 export class Detective {
 	allowedSpecificLicenses: string[]

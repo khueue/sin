@@ -5,7 +5,7 @@
 -  BREAKING: extractcode step is disabled, because it doesn't seem to work (why?).
 -  BREAKING: License category is no longer stated by ScanCode, so we only work
    with specific license accepts now.
--  Chalk is disabled due to issues with TS/imports.
+
 -  @todo Fix issue where "mit AND bsd" shows up even though both are accepted
    individually.
 

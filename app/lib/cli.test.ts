@@ -1,10 +1,11 @@
+import t from 'tap'
 import { $ } from 'zx'
-import { Cli } from './cli'
-import { LocalDatabase } from './db'
-import { createTestConfig } from './test-utils'
+
+import { Cli } from './cli.js'
+import { LocalDatabase } from './db.js'
+import { createTestConfig } from './test-utils.js'
 
 $.verbose = false
-jest.setTimeout(20_000)
 
 class OutputTracker {
 	infos: string[] = []
@@ -37,10 +38,10 @@ class OutputTracker {
 	}
 }
 
-async function createTestCli() {
+async function createTestCli(fullname: string) {
 	const loggerOut = new OutputTracker()
 	const rawLoggerOut = new OutputTracker()
-	const testConf = await createTestConfig()
+	const testConf = await createTestConfig(fullname)
 	testConf.logger = {
 		info(...x: any[]) {
 			loggerOut.pushInfo(x)
@@ -81,42 +82,42 @@ function args(...x: string[]) {
 	return ['', '', ...x]
 }
 
-test('licenses', async () => {
-	const { cli, loggerOut } = await createTestCli()
+t.test('licenses', async (t) => {
+	const { cli, loggerOut } = await createTestCli(t.fullname)
 
 	await cli.run(args('licenses', 'allow', 'specific', 'Ruby License'))
 	await cli.run(args('licenses', 'allow', 'category', 'Permissive'))
 	loggerOut.clearInfos()
 	await cli.run(args('licenses', 'list'))
-	expect(loggerOut.infos[0]).toMatch(`Allowed specific licenses`)
-	expect(loggerOut.infos[0]).toMatch(`Ruby License`)
-	expect(loggerOut.infos[1]).toMatch(`Allowed license categories`)
-	expect(loggerOut.infos[1]).toMatch(`Permissive`)
+	t.match(loggerOut.infos[0], `Allowed specific licenses`)
+	t.match(loggerOut.infos[0], `Ruby License`)
+	t.match(loggerOut.infos[1], `Allowed license categories`)
+	t.match(loggerOut.infos[1], `Permissive`)
 
 	await cli.run(args('licenses', 'unallow', 'specific', 'Ruby License'))
 	await cli.run(args('licenses', 'unallow', 'category', 'Permissive'))
 	loggerOut.clearInfos()
 	await cli.run(args('licenses', 'list'))
-	expect(loggerOut.infos[0]).toMatch(`Allowed specific licenses`)
-	expect(loggerOut.infos[0]).not.toMatch(`Ruby License`)
-	expect(loggerOut.infos[1]).toMatch(`Allowed license categories`)
-	expect(loggerOut.infos[1]).not.toMatch(`Permissive`)
+	t.match(loggerOut.infos[0], `Allowed specific licenses`)
+	t.notMatch(loggerOut.infos[0], `Ruby License`)
+	t.match(loggerOut.infos[1], `Allowed license categories`)
+	t.notMatch(loggerOut.infos[1], `Permissive`)
 })
 
-test('scan', async () => {
-	const { cli, loggerOut } = await createTestCli()
+t.test('scan', async (t) => {
+	const { cli, loggerOut } = await createTestCli(t.fullname)
 
 	loggerOut.clearInfos()
 	await cli.run(args('scan', '--verbose'))
 	const output = loggerOut.allInfosAsString()
-	expect(output).toContain(`STEP 1`)
+	t.match(output, `STEP 1`)
 	// expect(output).toContain(`STEP 2`)
-	expect(output).toContain(`STEP 3`)
-	expect(output).toContain(`STEP 4`)
+	t.match(output, `STEP 3`)
+	t.match(output, `STEP 4`)
 })
 
-test('audit', async () => {
-	const { cli, loggerOut } = await createTestCli()
+t.test('audit', async (t) => {
+	const { cli, loggerOut } = await createTestCli(t.fullname)
 
 	cli.db.stmtInsertFile.run({
 		file_path: 'some/file.txt',
@@ -137,12 +138,12 @@ test('audit', async () => {
 	loggerOut.clearInfos()
 	await cli.run(args('audit', '--verbose'))
 	const output = loggerOut.allInfosAsString()
-	expect(output).toContain(`Investigation saved`)
-	expect(output).toContain(`found 1`)
+	t.match(output, `Investigation saved`)
+	t.match(output, `found 1`)
 })
 
-test('accepted, csv', async () => {
-	const { cli, loggerOut, rawLoggerOut } = await createTestCli()
+t.test('accepted, csv', async (t) => {
+	const { cli, loggerOut, rawLoggerOut } = await createTestCli(t.fullname)
 
 	cli.db.stmtInsertFile.run({
 		file_path: 'some/accepted.txt',
@@ -160,15 +161,15 @@ test('accepted, csv', async () => {
 	await cli.run(args('accepted'))
 
 	const output = loggerOut.allInfosAsString()
-	expect(output).toContain(`Finding everything that has been manually accepted`)
+	t.match(output, `Finding everything that has been manually accepted`)
 
 	const rawOutput = rawLoggerOut.allInfosAsString()
-	expect(rawOutput).toContain(`file_path|reason`)
-	expect(rawOutput).toContain(`some/accepted.txt|Looks good!`)
+	t.match(rawOutput, `file_path|reason`)
+	t.match(rawOutput, `some/accepted.txt|Looks good!`)
 })
 
-test('accepted, json', async () => {
-	const { cli, loggerOut, rawLoggerOut } = await createTestCli()
+t.test('accepted, json', async (t) => {
+	const { cli, loggerOut, rawLoggerOut } = await createTestCli(t.fullname)
 
 	cli.db.stmtInsertFile.run({
 		file_path: 'some/accepted.txt',
@@ -186,12 +187,12 @@ test('accepted, json', async () => {
 	await cli.run(args('accepted', '--output', 'json'))
 
 	const output = loggerOut.allInfosAsString()
-	expect(output).toContain(`Finding everything that has been manually accepted`)
-	expect(output).toContain(`Report written`)
+	t.match(output, `Finding everything that has been manually accepted`)
+	t.match(output, `Report written`)
 })
 
-test('view', async () => {
-	const { cli, loggerOut, rawLoggerOut } = await createTestCli()
+t.test('view', async (t) => {
+	const { cli, loggerOut, rawLoggerOut } = await createTestCli(t.fullname)
 
 	cli.db.stmtInsertFile.run({
 		file_path: 'some/file-with-stuff.txt',
@@ -211,11 +212,11 @@ test('view', async () => {
 	await cli.run(args('view', 'some/file-with-stuff.txt'))
 
 	const rawOutput = rawLoggerOut.allInfosAsString()
-	expect(rawOutput).toContain(`Content is king!`)
+	t.match(rawOutput, `Content is king!`)
 })
 
-test('accept, exact', async () => {
-	const { cli, loggerOut, rawLoggerOut } = await createTestCli()
+t.test('accept, exact', async (t) => {
+	const { cli, loggerOut, rawLoggerOut } = await createTestCli(t.fullname)
 
 	cli.db.stmtInsertFile.run({
 		file_path: 'some/file.txt',
@@ -240,11 +241,11 @@ test('accept, exact', async () => {
 	await cli.run(args('accept', 'some/file.txt', 'GPL? Ok, just this once.'))
 
 	const output = loggerOut.allInfosAsString()
-	expect(output).toContain(`Accepted: some/file.txt`)
+	t.match(output, `Accepted: some/file.txt`)
 })
 
-test('accept, wildcard', async () => {
-	const { cli, loggerOut, rawLoggerOut } = await createTestCli()
+t.test('accept, wildcard', async (t) => {
+	const { cli, loggerOut, rawLoggerOut } = await createTestCli(t.fullname)
 
 	const filePaths = [
 		'a/node_modules/file1.txt',
@@ -279,11 +280,11 @@ test('accept, wildcard', async () => {
 	)
 
 	const output = loggerOut.allInfosAsString()
-	expect(output).toContain(`accepted 3`)
+	t.match(output, `accepted 3`)
 })
 
-test('unaccept, exact', async () => {
-	const { cli, loggerOut, rawLoggerOut } = await createTestCli()
+t.test('unaccept, exact', async (t) => {
+	const { cli, loggerOut, rawLoggerOut } = await createTestCli(t.fullname)
 
 	cli.db.stmtInsertFile.run({
 		file_path: 'some/file.txt',
@@ -308,11 +309,11 @@ test('unaccept, exact', async () => {
 	await cli.run(args('unaccept', 'some/file.txt'))
 
 	const output = loggerOut.allInfosAsString()
-	expect(output).toContain(`Unaccepted: some/file.txt`)
+	t.match(output, `Unaccepted: some/file.txt`)
 })
 
-test('unaccept, wildcard', async () => {
-	const { cli, loggerOut, rawLoggerOut } = await createTestCli()
+t.test('unaccept, wildcard', async (t) => {
+	const { cli, loggerOut, rawLoggerOut } = await createTestCli(t.fullname)
 
 	const filePaths = [
 		'a/node_modules/file1.txt',
@@ -345,5 +346,5 @@ test('unaccept, wildcard', async () => {
 	await cli.run(args('unaccept', '%/node_modules/%'))
 
 	const output = loggerOut.allInfosAsString()
-	expect(output).toContain(`unaccepted 3`)
+	t.match(output, `unaccepted 3`)
 })

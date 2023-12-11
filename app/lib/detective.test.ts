@@ -1,7 +1,9 @@
-import { Detective } from './detective'
-import type { AnalysedFile } from './types'
+import t from 'tap'
 
-test('innocent files', async () => {
+import { Detective } from './detective.js'
+import type { AnalysedFile } from './types.js'
+
+t.test('innocent files', async (t) => {
 	const detective = new Detective(['ruby'], [])
 
 	let file: AnalysedFile
@@ -11,7 +13,7 @@ test('innocent files', async () => {
 		filePath: 'some/file.txt',
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	expect(suspicious).toBeFalsy()
+	t.notOk(suspicious)
 
 	file = {
 		filePath: 'some/file.txt',
@@ -25,7 +27,7 @@ test('innocent files', async () => {
 		],
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	expect(suspicious).toBeFalsy()
+	t.notOk(suspicious)
 
 	file = {
 		filePath: 'some/file.txt',
@@ -37,10 +39,10 @@ test('innocent files', async () => {
 		currentAcceptedAt: new Date(),
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	expect(suspicious).toBeFalsy()
+	t.notOk(suspicious)
 })
 
-test('suspicious files', async () => {
+t.test('suspicious files', async (t) => {
 	const detective = new Detective(['ruby'], [])
 
 	let file: AnalysedFile
@@ -55,5 +57,5 @@ test('suspicious files', async () => {
 		],
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	expect(suspicious).toBeTruthy()
+	t.ok(suspicious)
 })

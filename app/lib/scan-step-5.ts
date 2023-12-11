@@ -1,12 +1,13 @@
-// import chalk from 'chalk'
+import chalk from 'chalk'
 import { mkdir, readFile, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { dirname } from 'path'
 import { $ } from 'zx'
-import type { LocalDatabase } from './db'
-import { Detective } from './detective'
-import { FileTree } from './tree'
-import type { AnalysedFileRow, BasicLogger } from './types'
+
+import type { LocalDatabase } from './db.js'
+import { Detective } from './detective.js'
+import { FileTree } from './tree.js'
+import type { AnalysedFileRow, BasicLogger } from './types.js'
 
 interface Config {
 	db: LocalDatabase
@@ -29,8 +30,7 @@ export class ScanStep5 {
 	}
 
 	async run() {
-		// this.logger.info(chalk`{yellow === STEP 5: Gather suspicious findings}`)
-		this.logger.info(`=== STEP 5: Gather suspicious findings`)
+		this.logger.info(chalk.yellow(`=== STEP 5: Gather suspicious findings`))
 
 		this.logger.info(`Analysing suspicious files in database ...`)
 		const files = this.db.fetchAnalysedFilesNeedingInvestigation()

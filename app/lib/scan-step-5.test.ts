@@ -1,11 +1,13 @@
+import t from 'tap'
 import { $ } from 'zx'
-import { LocalDatabase } from './db'
-import { ScanStep5 } from './scan-step-5'
-import { createTestConfig, testLogger } from './test-utils'
-import type { AnalysedFile } from './types'
 
-test('audit', async () => {
-	const testConf = await createTestConfig()
+import { LocalDatabase } from './db.js'
+import { ScanStep5 } from './scan-step-5.js'
+import { createTestConfig, testLogger } from './test-utils.js'
+import type { AnalysedFile } from './types.js'
+
+t.test('audit', async (t) => {
+	const testConf = await createTestConfig(t.fullname)
 	const logger = testLogger()
 	$.verbose = false
 
@@ -81,15 +83,15 @@ test('audit', async () => {
 	const auditTree = await step.run()
 
 	const countFindings = auditTree.countLeaves()
-	expect(countFindings).toBe(1)
+	t.match(countFindings, 1)
 
 	const detailedReport = auditTree.root['a1']['with-gpl.txt'].scanCodeReport
 
 	const gplFinding = detailedReport.license_detections[0].matches[0]
-	expect(gplFinding.matched_text).toContain('GPL License // line 2')
+	t.match(gplFinding.matched_text, 'GPL License // line 2')
 
 	const mitFinding = detailedReport.license_detections[0].matches[1]
-	expect(mitFinding.matched_text).toContain('MIT License // line 3')
+	t.match(mitFinding.matched_text, 'MIT License // line 3')
 })
 
 function prepareDbFiles(db: LocalDatabase, files: AnalysedFile[]) {

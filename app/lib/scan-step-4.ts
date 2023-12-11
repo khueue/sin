@@ -1,13 +1,14 @@
-// import chalk from 'chalk'
+import chalk from 'chalk'
 import { existsSync } from 'fs'
 import { readFile } from 'fs/promises'
-import type { LocalDatabase } from './db'
+
+import type { LocalDatabase } from './db.js'
 import type {
 	AnalysedFile,
 	BasicLogger,
 	LicenseInfo,
 	ScanCodeEntry,
-} from './types'
+} from './types.js'
 
 const SHA256_EMPTY_STRING =
 	'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
@@ -34,8 +35,7 @@ export class ScanStep4 {
 	}
 
 	async run() {
-		// this.logger.info(chalk`{yellow === STEP 4: Save results to database}`)
-		this.logger.info(`=== STEP 4: Save results to database`)
+		this.logger.info(chalk.yellow(`=== STEP 4: Save results to database`))
 
 		if (!existsSync(this.scanCodeOutPath)) {
 			this.logger.info(`Nothing to be done (no ScanCode report found).`)

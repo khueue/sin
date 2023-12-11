@@ -1,10 +1,11 @@
-// import chalk from 'chalk'
+import chalk from 'chalk'
 import { existsSync } from 'fs'
 import { mkdir } from 'fs/promises'
 import { cpus } from 'os'
 import { dirname } from 'path'
 import { $ } from 'zx'
-import type { BasicLogger } from './types'
+
+import type { BasicLogger } from './types.js'
 
 interface Config {
 	dirtyRoot: string
@@ -27,8 +28,7 @@ export class ScanStep3 {
 	}
 
 	async run() {
-		// this.logger.info(chalk`{yellow === STEP 3: Run ScanCode on dirty files}`)
-		this.logger.info(`=== STEP 3: Run ScanCode on dirty files`)
+		this.logger.info(chalk.yellow(`=== STEP 3: Run ScanCode on dirty files`))
 
 		if (!existsSync(this.dirtyRoot)) {
 			this.logger.info(`Nothing to be done (no dirty files).`)

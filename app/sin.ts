@@ -1,11 +1,11 @@
-#!/usr/bin/env ts-node-transpile-only
+#!/usr/bin/env tsx
 
 const label = '- Time, total';
 console.time(label);
 
-import { Cli } from './lib/cli';
-import { LocalDatabase } from './lib/db';
-import * as defaults from './lib/defaults';
+import { Cli } from './lib/cli.js';
+import { LocalDatabase } from './lib/db.js';
+import * as defaults from './lib/defaults.js';
 
 const localDb = new LocalDatabase({
 	sqlitePath: defaults.dbPath,

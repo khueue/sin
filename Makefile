@@ -9,16 +9,13 @@ VERSION=1.0.0
 IMAGE_TAG=khueue/sin:$(VERSION)
 
 install:
-	make shell cmd="yarn install"
+	make shell cmd="npm install"
 
 pretty:
-	make shell cmd="yarn pretty"
+	make shell cmd="npm run pretty"
 
 test:
-	make shell cmd="yarn test"
-
-coverage:
-	make shell cmd="yarn cov"
+	make shell cmd="npm run test"
 
 release: build_image
 	docker login --username khueue

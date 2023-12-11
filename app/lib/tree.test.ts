@@ -1,16 +1,18 @@
-import { Detective } from './detective'
-import { FileTree } from './tree'
-import type { AnalysedFile } from './types'
+import t from 'tap'
 
-test('empty tree', () => {
+import { Detective } from './detective.js'
+import { FileTree } from './tree.js'
+import type { AnalysedFile } from './types.js'
+
+t.test('empty tree', async (t) => {
 	const files: AnalysedFile[] = []
 	const detective = new Detective([], [])
 	const tree = new FileTree(files, detective)
 
-	expect(tree.root).toEqual({})
+	t.match(tree.root, {})
 })
 
-test('non-empty tree', () => {
+t.test('non-empty tree', async (t) => {
 	const files: AnalysedFile[] = [
 		{
 			filePath: 'a1/a2/a3/file1',
@@ -28,7 +30,7 @@ test('non-empty tree', () => {
 	const detective = new Detective([], [])
 	const tree = new FileTree(files, detective)
 
-	expect(tree.root).toEqual({
+	t.match(tree.root, {
 		a1: {
 			a2: {
 				a3: {
@@ -50,7 +52,7 @@ test('non-empty tree', () => {
 	})
 })
 
-test('prune recursive under okay license file', () => {
+t.test('prune recursive under okay license file', async (t) => {
 	const detective = new Detective(['ruby'], [])
 	const tree = new FileTree([], detective)
 	tree.root = {
@@ -80,7 +82,7 @@ test('prune recursive under okay license file', () => {
 	}
 	tree.pruneLevelsWithAcceptedLicenses()
 
-	expect(tree.root).toEqual({
+	t.match(tree.root, {
 		a1: {
 			// a2 is gone.
 			file3: {
@@ -93,7 +95,7 @@ test('prune recursive under okay license file', () => {
 	})
 })
 
-test('prune empty nodes', () => {
+t.test('prune empty nodes', async (t) => {
 	const detective = new Detective([], [])
 	const tree = new FileTree([], detective)
 	tree.root = {
@@ -111,7 +113,7 @@ test('prune empty nodes', () => {
 	}
 	tree.pruneEmptyNodes()
 
-	expect(tree.root).toEqual({
+	t.match(tree.root, {
 		a1: {
 			// a2 is gone.
 			file3: {
@@ -122,7 +124,7 @@ test('prune empty nodes', () => {
 	})
 })
 
-test('prune individually accepted', () => {
+t.test('prune individually accepted', async (t) => {
 	const detective = new Detective(['ruby'], [])
 	const tree = new FileTree([], detective)
 	tree.root = {
@@ -172,7 +174,7 @@ test('prune individually accepted', () => {
 	}
 	tree.pruneAllowedFiles()
 
-	expect(tree.root).toEqual({
+	t.match(tree.root, {
 		a1: {
 			a2: {},
 		},
@@ -188,7 +190,7 @@ test('prune individually accepted', () => {
 	})
 })
 
-test('count leaves', () => {
+t.test('count leaves', async (t) => {
 	const detective = new Detective([], [])
 	const tree = new FileTree([], detective)
 	tree.root = {
@@ -211,10 +213,10 @@ test('count leaves', () => {
 	}
 	const count = tree.countLeaves()
 
-	expect(count).toBe(4)
+	t.match(count, 4)
 })
 
-test('apply to leaves', async () => {
+t.test('apply to leaves', async (t) => {
 	const detective = new Detective([], [])
 	const tree = new FileTree([], detective)
 	tree.root = {
@@ -240,5 +242,5 @@ test('apply to leaves', async () => {
 		paths.push(file.filePath)
 	})
 
-	expect(paths).toEqual(['a1/a2/LICENSE', 'a1/a2/file2', 'a1/file3', 'file4'])
+	t.match(paths, ['a1/a2/LICENSE', 'a1/a2/file2', 'a1/file3', 'file4'])
 })
