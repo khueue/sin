@@ -9,6 +9,7 @@ VERSION=1.0.0
 IMAGE_TAG=khueue/sin:$(VERSION)
 
 install:
+	rm -rf ./app/node_modules/
 	make shell cmd="npm install"
 
 pretty:
@@ -21,7 +22,7 @@ release: build_image
 	docker login --username khueue
 	docker push $(IMAGE_TAG)
 
-# export DOCKER_DEFAULT_PLATFORM := linux/amd64
+export DOCKER_DEFAULT_PLATFORM := linux/amd64
 
 cmd := bash
 shell: create_dirs build_image

@@ -23,6 +23,7 @@ interface Config {
 	sourceRoot: string
 	dirtyRoot: string
 	reportRoot: string
+	scanCodeBinary: string
 	scanCodeOutPath: string
 	auditOutPath: string
 	acceptedOutPath: string
@@ -250,6 +251,7 @@ export class Cli {
 			const step3 = new ScanStep3({
 				dirtyRoot: this.config.dirtyRoot,
 				logger: this.logger,
+				scanCodeBinary: this.config.scanCodeBinary,
 				scanCodeOutPath: this.config.scanCodeOutPath,
 				verbose,
 			})
@@ -294,6 +296,7 @@ export class Cli {
 		const step5 = new ScanStep5({
 			db: this.db,
 			auditOutPath: this.config.auditOutPath,
+			scanCodeBinary: this.config.scanCodeBinary,
 			logger: this.logger,
 			verbose: options.verbose ?? false,
 		})

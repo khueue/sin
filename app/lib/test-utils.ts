@@ -16,6 +16,7 @@ interface TestConfig {
 	nowIso: string
 	nowSlug: string
 	dbPath: string
+	scanCodeBinary: string
 	scanCodeOutPath: string
 	auditOutPath: string
 	acceptedOutPath: string
@@ -58,6 +59,7 @@ export async function createTestConfig(fullname: string) {
 		dirtyRoot,
 		reportRoot,
 		sourceRoot,
+		scanCodeBinary: `/scancode/scancode`,
 		scanCodeOutPath: `${reportRoot}/scancode.json`,
 		auditOutPath: `${reportRoot}/audit.json`,
 		acceptedOutPath: `${reportRoot}/accepted.json`,

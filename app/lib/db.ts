@@ -25,7 +25,9 @@ export class LocalDatabase {
 
 		if (!existsSync(config.sqlitePath)) {
 			this.logger.info(
-				chalk.magenta(`Database ${config.sqlitePath} does not exist, creating it.`),
+				chalk.magenta(
+					`Database ${config.sqlitePath} does not exist, creating it.`,
+				),
 			)
 		}
 		const opts: Options = {}

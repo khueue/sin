@@ -12,6 +12,7 @@ import type { AnalysedFileRow, BasicLogger } from './types.js'
 interface Config {
 	db: LocalDatabase
 	logger: BasicLogger
+	scanCodeBinary: string
 	auditOutPath: string
 	verbose?: boolean
 }
@@ -19,12 +20,14 @@ interface Config {
 export class ScanStep5 {
 	db: LocalDatabase
 	logger: BasicLogger
+	scanCodeBinary: string
 	auditOutPath: string
 	verbose: boolean
 
 	constructor(config: Config) {
 		this.db = config.db
 		this.verbose = config.verbose ?? false
+		this.scanCodeBinary = config.scanCodeBinary
 		this.logger = config.logger
 		this.auditOutPath = config.auditOutPath
 	}
@@ -76,7 +79,7 @@ export class ScanStep5 {
 			await writeFile(pathToScan, row.content_text ?? '', 'utf-8')
 			const detailedReportPath = `${tempDir}/tmp-scancode.json`
 			const cmd = [
-				'scancode',
+				this.scanCodeBinary,
 				'--quiet',
 				'--full-root',
 				'--license', // Gives license information.

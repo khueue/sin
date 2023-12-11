@@ -46,6 +46,7 @@ t.test('scan dirty files', async (t) => {
 	const step = new ScanStep3({
 		logger,
 		dirtyRoot: testConf.dirtyRoot,
+		scanCodeBinary: testConf.scanCodeBinary,
 		scanCodeOutPath: testConf.scanCodeOutPath,
 		verbose: true,
 	})

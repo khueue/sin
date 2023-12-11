@@ -1,7 +1,8 @@
 # UPGRADE_POINT.
 # See: https://hub.docker.com/_/python/
-# NOTE: See ScanCode's Python requirements: https://scancode-toolkit.readthedocs.io/en/latest/getting-started/install.html#install-prerequisites
-FROM python:3.11.5-bookworm
+# NOTE: See ScanCode's Python requirements:
+# - https://scancode-toolkit.readthedocs.io/en/latest/getting-started/install.html#install-prerequisites
+FROM --platform=linux/amd64 python:3.10.13-bookworm
 
 RUN apt update
 
@@ -15,17 +16,31 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesourc
 RUN apt update
 RUN apt install -y nodejs
 
-# # See: https://github.com/nexB/scancode-toolkit/releases
-RUN pip install scancode-toolkit==32.0.2
-# RUN pip install extractcode[full]
-
 # Useful for browsing files and the database.
 RUN apt install -y less
 RUN apt install -y sqlite3
 
+WORKDIR /scancode
+
+# UPGRADE_POINT.
+# See: https://github.com/nexB/scancode-toolkit/releases/
+# NOTE: Match with Python version.
+ARG SCANCODE_URL=https://github.com/nexB/scancode-toolkit/releases/download/v32.0.8/scancode-toolkit-v32.0.8_py3.10-linux.tar.gz
+RUN \
+	wget ${SCANCODE_URL} \
+	&& tar -xvf ./scancode-toolkit-*.tar.gz --strip-components=1 \
+	&& rm ./scancode-toolkit-*.tar.gz
+
+# Initialize tool.
+RUN ./scancode --help
+
+# NOTE: This (and only this) seems to work on ARM:
+# See: https://github.com/nexB/scancode-toolkit/releases
+# RUN pip install scancode-toolkit==32.0.2
+
 WORKDIR /app
 
-# Run tool from anywhere.
+# Run app from anywhere.
 ENV PATH=/app:${PATH}
 
 # Ignore irrelevant ScanCode warnings.
@@ -44,7 +59,8 @@ RUN echo 'export PS1="\n🐳 \[\033[1;36m\]sin.ts \[\033[1;34m\]\$PWD\[\033[0;35
 COPY ./app/package*.json ./
 RUN npm install
 
-# MATCH
+# UPGRADE_POINT.
+# See: https://github.com/privatenumber/tsx/releases
 RUN npm install --global tsx@4.6.2
 
 # Copy all app code.

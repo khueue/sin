@@ -10,6 +10,7 @@ import type { BasicLogger } from './types.js'
 interface Config {
 	dirtyRoot: string
 	logger: BasicLogger
+	scanCodeBinary: string
 	scanCodeOutPath: string
 	verbose?: boolean
 }
@@ -17,12 +18,14 @@ interface Config {
 export class ScanStep3 {
 	dirtyRoot: string
 	logger: BasicLogger
+	scanCodeBinary: string
 	scanCodeOutPath: string
 	verbose: boolean
 
 	constructor(config: Config) {
 		this.dirtyRoot = config.dirtyRoot
 		this.logger = config.logger
+		this.scanCodeBinary = config.scanCodeBinary
 		this.scanCodeOutPath = config.scanCodeOutPath
 		this.verbose = config.verbose ?? false
 	}
@@ -39,7 +42,7 @@ export class ScanStep3 {
 
 		const verboseFlag = this.verbose ? '--verbose' : ''
 		const cmd = [
-			'scancode',
+			this.scanCodeBinary,
 			verboseFlag,
 			'--processes',
 			cpus().length,
