@@ -18,8 +18,8 @@
 		"noImplicitAny": true,
 		"noImplicitReturns": true,
 		"noImplicitThis": true,
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
 		"outDir": "",
 		"pretty": true,
 		"skipLibCheck": true,
@@ -27,5 +27,5 @@
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true
 	},
-	"include": ["./**/*.ts"]
+	"include": ["./lib/*.ts", "./*.ts"]
 }

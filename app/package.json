@@ -4,11 +4,12 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"pretty": "prettier --write ./**/*.ts",
-		"test": "tap && tap report html"
+		"pretty": "prettier --write ./**/*.ts ./**/*.json ./**/*.mjs",
+		"typecheck": "tsc --noEmit",
+		"cov-report": "tap report html --allow-incomplete-coverage",
+		"test": "npm run typecheck && npm run pretty && tap --allow-incomplete-coverage && npm run cov-report"
 	},
-	"// UPGRADE_POINT": {
-	},
+	"// UPGRADE_POINT": {},
 	"dependencies": {
 		"@types/better-sqlite3": "7.6.8",
 		"@types/node": "20.10.4",

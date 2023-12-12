@@ -1,7 +1,5 @@
 export default {
-	plugins: [
-		"prettier-plugin-organize-imports"
-	],
+	plugins: ['prettier-plugin-organize-imports'],
 	printWidth: 80,
 	semi: false,
 	singleQuote: true,

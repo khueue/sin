@@ -239,7 +239,9 @@ export class Cli {
 				chalk.red(`STEP 2 failed with errors, continuing anyway.`),
 			)
 			this.logger.error(
-				chalk.red(`This probably just means that a few archives couldn't be decompressed.`),
+				chalk.red(
+					`This probably just means that a few archives couldn't be decompressed.`,
+				),
 			)
 		}
 		this.rawLogger.timeEnd(label)

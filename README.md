@@ -1,7 +1,7 @@
 # Sin
 
 ![release](https://img.shields.io/badge/release-1.0.0-green)
-![coverage](https://img.shields.io/badge/coverage-88%25-green)
+![coverage](https://img.shields.io/badge/coverage-91%25-green)
 
 _Keep track of sinful license usage._
 
@@ -22,7 +22,7 @@ Features:
 -  **Simple database** - Manages a simple SQLite database that can be easily
    browsed or consumed by other tools.
 
-Sin has been tested on a codebase with over 300k files:
+Sin has been tested on a multi-repo codebase with over 300k files:
 
 -  Initial scan: ~6 hours.
 -  Subsequent scans: ~10 minutes (assuming that not many files have changed).
@@ -108,12 +108,15 @@ Commands:
   help [command]             display help for command
 ```
 
+## Limitations
+
+-  There is currently no ARM support (because ScanCode does not support it).
+
 ## Tips
 
 -  The bulk of the scan time is spent running ScanCode. Give as many CPUs
    as you can to Docker, since ScanCode is very good at saturating every
    available CPU.
-
 
 # Auditing
 
@@ -130,6 +133,8 @@ The `sin.ts audit` tool gathers a report according to the following:
 -  The remainder is a set of files that needs looking into.
 
 ## Automatic Acceptance
+
+XXX Wrong since 1.0.0:
 
 The engine is configured to accept licenses using two settings:
 
