@@ -9,8 +9,7 @@ import {
 	testLogger,
 } from './test-utils.js'
 
-// @todo Skipped due to extractcode not working properly. Why?
-t.skip('extract archives', async (t) => {
+t.test('extract archives', async (t) => {
 	const testConf = await createTestConfig(t.fullname)
 	const logger = testLogger()
 	$.verbose = false

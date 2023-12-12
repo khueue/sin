@@ -81,7 +81,7 @@ docker run --interactive --tty --rm --init \
    --mount type="bind",source="$(PWD)/sin-data/db",target="/data/db",consistency="delegated" \
    --mount type="bind",source="$(PWD)/sin-data/tmp",target="/data/tmp",consistency="delegated" \
    --mount type="bind",source="$(PWD)/sin-data/src",target="/data/src",readonly \
-   khueue/sin:1.0.0
+   khueue/sin:1.0.0-beta
 ```
 
 The above command will place you inside a bash shell, allowing you to run

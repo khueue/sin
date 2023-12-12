@@ -2,7 +2,7 @@
 # See: https://hub.docker.com/_/python/
 # NOTE: See ScanCode's Python requirements:
 # - https://scancode-toolkit.readthedocs.io/en/latest/getting-started/install.html#install-prerequisites
-FROM --platform=linux/amd64 python:3.10.13-bookworm
+FROM --platform=linux/amd64 python:3.11.7-bookworm
 
 RUN apt update
 
@@ -20,32 +20,6 @@ RUN apt install -y nodejs
 RUN apt install -y less
 RUN apt install -y sqlite3
 
-WORKDIR /scancode
-
-# UPGRADE_POINT.
-# See: https://github.com/nexB/scancode-toolkit/releases/
-# NOTE: Match with Python version.
-ARG SCANCODE_URL=https://github.com/nexB/scancode-toolkit/releases/download/v32.0.8/scancode-toolkit-v32.0.8_py3.10-linux.tar.gz
-RUN \
-	wget ${SCANCODE_URL} \
-	&& tar -xvf ./scancode-toolkit-*.tar.gz --strip-components=1 \
-	&& rm ./scancode-toolkit-*.tar.gz
-
-# Initialize tool.
-RUN ./scancode --help
-
-# NOTE: This (and only this) seems to work on ARM:
-# See: https://github.com/nexB/scancode-toolkit/releases
-# RUN pip install scancode-toolkit==32.0.2
-
-WORKDIR /app
-
-# Run app from anywhere.
-ENV PATH=/app:${PATH}
-
-# Ignore irrelevant ScanCode warnings.
-ENV PYTHONWARNINGS="ignore"
-
 # Give Node more space.
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
@@ -55,7 +29,29 @@ RUN apt install -y bash-completion
 RUN echo '[[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && . /usr/share/bash-completion/bash_completion' >> ~/.bashrc
 RUN echo 'export PS1="\n🐳 \[\033[1;36m\]sin.ts \[\033[1;34m\]\$PWD\[\033[0;35m\]\n\[\033[1;36m\]$ \[\033[0m\]"' >> ~/.bashrc
 
-# Install Node modules when package.json changes.
+# Run scancode from anywhere.
+WORKDIR /scancode-toolkit
+ENV PATH=/scancode-toolkit:${PATH}
+
+# UPGRADE_POINT.
+# See: https://github.com/nexB/scancode-toolkit/releases/
+# NOTE: Match with Python version in base image.
+ARG SCANCODE_URL=https://github.com/nexB/scancode-toolkit/releases/download/v32.0.8/scancode-toolkit-v32.0.8_py3.11-linux.tar.gz
+RUN wget ${SCANCODE_URL} \
+	&& tar -xvf ./scancode-toolkit-*.tar.gz --strip-components=1 \
+	&& rm ./scancode-toolkit-*.tar.gz
+
+# Ignore irrelevant ScanCode warnings.
+ENV PYTHONWARNINGS="ignore"
+
+# Initialize tool.
+RUN ./scancode --help
+
+# Run app from anywhere.
+WORKDIR /app
+ENV PATH=/app:${PATH}
+
+# Update modules when needed.
 COPY ./app/package*.json ./
 RUN npm install
 

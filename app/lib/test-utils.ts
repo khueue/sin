@@ -59,7 +59,7 @@ export async function createTestConfig(fullname: string) {
 		dirtyRoot,
 		reportRoot,
 		sourceRoot,
-		scanCodeBinary: `/scancode/scancode`,
+		scanCodeBinary: `scancode`,
 		scanCodeOutPath: `${reportRoot}/scancode.json`,
 		auditOutPath: `${reportRoot}/audit.json`,
 		acceptedOutPath: `${reportRoot}/accepted.json`,

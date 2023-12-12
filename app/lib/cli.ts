@@ -6,7 +6,7 @@ import { basename, dirname } from 'path'
 import type { LocalDatabase } from './db.js'
 import { Detective } from './detective.js'
 import { ScanStep1 } from './scan-step-1.js'
-// import { ScanStep2 } from './scan-step-2.js'
+import { ScanStep2 } from './scan-step-2.js'
 import { ScanStep3 } from './scan-step-3.js'
 import { ScanStep4 } from './scan-step-4.js'
 import { ScanStep5 } from './scan-step-5.js'
@@ -224,26 +224,26 @@ export class Cli {
 		this.rawLogger.timeEnd(label)
 		this.rawLogger.info()
 
-		// label = '- Time, step2'
-		// this.rawLogger.time(label)
-		// try {
-		// 	const step2 = new ScanStep2({
-		// 		dirtyRoot: this.config.dirtyRoot,
-		// 		logger: this.logger,
-		// 		skipExtractArchives: this.config.skipExtractArchives ?? false,
-		// 	})
-		// 	await step2.run()
-		// } catch (e: any) {
-		// 	errors.push(e)
-		// 	this.logger.error(
-		// 		// chalk`{red STEP 2 failed with errors, continuing anyway.}`,
-		// 	)
-		// 	this.logger.error(
-		// 		// chalk`{red This probably just means that a few archives couldn't be decompressed.}`,
-		// 	)
-		// }
-		// this.rawLogger.timeEnd(label)
-		// this.rawLogger.info()
+		label = '- Time, step2'
+		this.rawLogger.time(label)
+		try {
+			const step2 = new ScanStep2({
+				dirtyRoot: this.config.dirtyRoot,
+				logger: this.logger,
+				skipExtractArchives: this.config.skipExtractArchives ?? false,
+			})
+			await step2.run()
+		} catch (e: any) {
+			errors.push(e)
+			this.logger.error(
+				chalk.red(`STEP 2 failed with errors, continuing anyway.`),
+			)
+			this.logger.error(
+				chalk.red(`This probably just means that a few archives couldn't be decompressed.`),
+			)
+		}
+		this.rawLogger.timeEnd(label)
+		this.rawLogger.info()
 
 		label = '- Time, step3'
 		this.rawLogger.time(label)

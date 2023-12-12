@@ -2,7 +2,6 @@
 
 ## 1.0.0 (2023-XXXXX) (UNRELEASED)
 
--  BREAKING: extractcode step is disabled, because it doesn't seem to work (why?).
 -  BREAKING: License category is no longer stated by ScanCode, so we only work
    with specific license accepts now.
 

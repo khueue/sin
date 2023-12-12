@@ -5,7 +5,7 @@ SHELL=/usr/bin/env bash
 
 # UPGRADE_POINT.
 # NOTE: Search through the repo for mentions of previous version when bumping.
-VERSION=1.0.0
+VERSION=1.0.0-beta
 IMAGE_TAG=khueue/sin:$(VERSION)
 
 install:
@@ -21,8 +21,6 @@ test:
 release: build_image
 	docker login --username khueue
 	docker push $(IMAGE_TAG)
-
-export DOCKER_DEFAULT_PLATFORM := linux/amd64
 
 cmd := bash
 shell: create_dirs build_image
@@ -42,5 +40,5 @@ create_dirs:
 build_image:
 	docker build \
 		--tag $(IMAGE_TAG) \
-		--file ./Dockerfile \
+		--file ./docker/Dockerfile.x86 \
 		./

@@ -77,6 +77,7 @@ t.test('audit', async (t) => {
 	const step = new ScanStep5({
 		db,
 		logger,
+		scanCodeBinary: testConf.scanCodeBinary,
 		auditOutPath: testConf.auditOutPath,
 		verbose: true,
 	})
