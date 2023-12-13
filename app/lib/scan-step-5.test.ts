@@ -15,8 +15,7 @@ t.test('audit', async (t) => {
 		sqlitePath: testConf.dbPath,
 		logger,
 	})
-	db.allowedSpecificLicenses = ['ruby', 'mit', 'bsd-new']
-	db.allowedLicenseCategories = []
+	db.allowedLicenses = ['ruby', 'mit', 'bsd-new']
 
 	const dbFiles: AnalysedFile[] = [
 		{
@@ -24,12 +23,7 @@ t.test('audit', async (t) => {
 			contentText: `
 				Ruby License
 			`,
-			licenses: [
-				{
-					license_expression: 'ruby',
-					// category: '',
-				},
-			],
+			licenses: ['ruby'],
 		},
 		{
 			filePath: 'a1/with-gpl.txt',
@@ -37,16 +31,7 @@ t.test('audit', async (t) => {
 				GPL License // line 2
 				MIT License // line 3
 			`,
-			licenses: [
-				{
-					license_expression: 'gpl-1.0',
-					// category: 'Copyleft',
-				},
-				{
-					license_expression: 'mit',
-					// category: 'Permissive',
-				},
-			],
+			licenses: ['gpl-1.0', 'mit'],
 		},
 		{
 			filePath: 'a1/permissive-only.txt',
@@ -54,16 +39,7 @@ t.test('audit', async (t) => {
 				MIT
 				BSD
 			`,
-			licenses: [
-				{
-					license_expression: 'mit',
-					// category: 'Permissive',
-				},
-				{
-					license_expression: 'bsd-new',
-					// category: 'Permissive',
-				},
-			],
+			licenses: ['mit', 'bsd-new'],
 		},
 		{
 			filePath: 'a2/nonsense.txt',

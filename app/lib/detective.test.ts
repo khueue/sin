@@ -4,7 +4,7 @@ import { Detective } from './detective.js'
 import type { AnalysedFile } from './types.js'
 
 t.test('innocent files', async (t) => {
-	const detective = new Detective(['ruby'], [])
+	const detective = new Detective(['mit', 'bsd-new'])
 
 	let file: AnalysedFile
 	let suspicious: boolean
@@ -13,49 +13,33 @@ t.test('innocent files', async (t) => {
 		filePath: 'some/file.txt',
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	t.notOk(suspicious)
+	t.match(suspicious, false)
 
 	file = {
 		filePath: 'some/file.txt',
-		licenses: [
-			{
-				license_expression: 'ruby',
-			},
-			// {
-			// 	name: '',
-			// },
-		],
+		licenses: ['bsd-new'],
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	t.notOk(suspicious)
+	t.match(suspicious, false)
 
 	file = {
 		filePath: 'some/file.txt',
-		licenses: [
-			{
-				license_expression: 'gpl-1.0',
-			},
-		],
-		currentAcceptedAt: new Date(),
+		licenses: ['bsd-new', 'mit'],
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	t.notOk(suspicious)
+	t.match(suspicious, false)
 })
 
 t.test('suspicious files', async (t) => {
-	const detective = new Detective(['ruby'], [])
+	const detective = new Detective(['mit', 'bsd-new'])
 
 	let file: AnalysedFile
 	let suspicious: boolean
 
 	file = {
 		filePath: 'some/file.txt',
-		licenses: [
-			{
-				license_expression: 'What Is This License',
-			},
-		],
+		licenses: ['mit OR gpl-1.0-plus'],
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	t.ok(suspicious)
+	t.match(suspicious, true)
 })

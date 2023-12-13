@@ -52,7 +52,7 @@ t.test('save to db, some old', async (t) => {
 		file_path: someFile.filePath,
 		content_sha256: 'old_content_sha256',
 		content_text: someFile.contents,
-		licenses: '{"old":"licenses"}',
+		licenses: '["old1","old2"]',
 		previous_accepted_reason: 'old_previous_accepted_reason',
 		current_accepted_reason: 'old_current_accepted_reason',
 		current_accepted_at: 'old_current_accepted_at',
@@ -85,7 +85,7 @@ t.test('save to db, some old', async (t) => {
 		}) as any
 		const dirtyFile = findDirtyFile(dirtyFiles, reportEntry.path)
 		// Should be in database with correct hash.
-		t.equal(row.content_sha256, reportEntry.sha256)
+		t.match(row.content_sha256, reportEntry.sha256)
 		// Should move current reason to previous if it was already in db.
 		if (dirtyFile.inDb) {
 			t.match(row.previous_accepted_reason, 'old_current_accepted_reason')

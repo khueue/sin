@@ -45,5 +45,5 @@ t.test('extract archives', async (t) => {
 	await step.run()
 
 	const finalDirtyFiles = await globby(`${testConf.dirtyRoot}/**`)
-	t.equal(finalDirtyFiles.length, 4)
+	t.match(finalDirtyFiles.length, 4)
 })

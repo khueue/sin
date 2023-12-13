@@ -52,7 +52,7 @@ t.test('scan dirty files', async (t) => {
 	})
 	await step.run()
 
-	t.ok(existsSync(testConf.scanCodeOutPath))
+	t.match(existsSync(testConf.scanCodeOutPath), true)
 
 	const reportContents = await readFile(testConf.scanCodeOutPath, 'utf-8')
 	const scannedFiles: ScanCodeEntry[] = JSON.parse(reportContents).files

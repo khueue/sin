@@ -45,7 +45,7 @@ t.test('2 dirty', async (t) => {
 	await step.run('**')
 
 	const dirtyFiles = await globby(`${testConf.dirtyRoot}/**`)
-	t.equal(dirtyFiles.length, 2)
+	t.match(dirtyFiles.length, 2)
 })
 
 t.test('1 unchanged, 1 dirty', async (t) => {
@@ -84,5 +84,5 @@ t.test('1 unchanged, 1 dirty', async (t) => {
 	await step1.run('**')
 
 	const dirtyFiles = await globby(`${testConf.dirtyRoot}/**`)
-	t.equal(dirtyFiles.length, 1, 'aoeu')
+	t.match(dirtyFiles.length, 1)
 })

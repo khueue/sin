@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { mkdir, readFile, writeFile } from 'fs/promises'
+import { mkdir, mkdtemp, readFile, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { dirname } from 'path'
 import { $ } from 'zx'
@@ -37,10 +37,7 @@ export class ScanStep5 {
 
 		this.logger.info(`Analysing suspicious files in database ...`)
 		const files = this.db.fetchAnalysedFilesNeedingInvestigation()
-		const detective = new Detective(
-			this.db.allowedSpecificLicenses,
-			this.db.allowedLicenseCategories,
-		)
+		const detective = new Detective(this.db.allowedLicenses)
 		const tree = new FileTree(Object.values(files), detective)
 		tree.pruneLevelsWithAcceptedLicenses()
 		tree.pruneAllowedFiles()
@@ -74,7 +71,7 @@ export class ScanStep5 {
 			const row = stmt.get({
 				file_path: node.filePath,
 			}) as AnalysedFileRow
-			const tempDir = tmpdir()
+			const tempDir = await mkdtemp(tmpdir() + '/details-')
 			const pathToScan = `${tempDir}/tmp-content-file`
 			await writeFile(pathToScan, row.content_text ?? '', 'utf-8')
 			const detailedReportPath = `${tempDir}/tmp-scancode.json`
@@ -84,7 +81,7 @@ export class ScanStep5 {
 				'--full-root',
 				'--license', // Gives license information.
 				'--classify', // Gives is_legal flag.
-				'--license-text', // Gives a copy of the suspicious lines in file.
+				'--license-text', // Gives a copy of the suspicious lines.
 				'--json',
 				detailedReportPath,
 				pathToScan,

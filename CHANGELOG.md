@@ -2,11 +2,8 @@
 
 ## 1.0.0 (2023-XXXXX) (UNRELEASED)
 
--  BREAKING: License category is no longer stated by ScanCode, so we only work
-   with specific license accepts now.
-
--  @todo Fix issue where "mit AND bsd" shows up even though both are accepted
-   individually.
+-  BREAKING: License category is no longer stated by ScanCode, so it only uses
+   specific license accepts now.
 
 ## 0.0.6 (2022-01-21)
 

@@ -58,7 +58,17 @@ Sin runs in a docker container, and uses the following directories:
    Mount this folder if you wish to expose these files to your host (useful
    for debugging etc.).
 
-## Example
+## Example 1: Try it out
+
+1. Clone this repo and cd into it.
+2. Run: `make install_local shell`.
+3. Inside the container, run commands like:
+   -  `sin.ts scan` - Perform scan on "bogus" source code under ./examples.
+   -  `sin.ts audit` - Generate an "audit" file that lists suspicions.
+   -  `sin.ts licenses allow specific 'mit'` - Accept MIT license.
+   -  `sin.ts audit` - Audit again, this time ignoring everything under MIT.
+
+## Example 2: More thorough
 
 Make sure the dirs to be mounted exist on the host:
 
@@ -81,7 +91,7 @@ docker run --interactive --tty --rm --init \
    --mount type="bind",source="$(PWD)/sin-data/db",target="/data/db",consistency="delegated" \
    --mount type="bind",source="$(PWD)/sin-data/tmp",target="/data/tmp",consistency="delegated" \
    --mount type="bind",source="$(PWD)/sin-data/src",target="/data/src",readonly \
-   khueue/sin:1.0.0-beta
+   khueue/sin:1.0.0
 ```
 
 The above command will place you inside a bash shell, allowing you to run

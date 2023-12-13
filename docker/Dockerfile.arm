@@ -1,7 +1,7 @@
 # UPGRADE_POINT.
 # See: https://hub.docker.com/_/python/
-# NOTE: See ScanCode's Python requirements:
-# - https://scancode-toolkit.readthedocs.io/en/latest/getting-started/install.html#install-prerequisites
+# NOTE: Match with ScanCode's Python requirements:
+# - https://github.com/nexB/scancode-toolkit/releases
 FROM --platform=linux/arm64 python:3.11.7-bookworm
 
 RUN apt update
@@ -28,7 +28,7 @@ RUN pip install scancode-toolkit==32.0.2
 
 WORKDIR /app
 
-# Run app from anywhere.
+# Run CLI tool from anywhere.
 ENV PATH=/app:${PATH}
 
 # Ignore irrelevant ScanCode warnings.
@@ -46,10 +46,6 @@ RUN echo 'export PS1="\n🐳 \[\033[1;36m\]sin.ts \[\033[1;34m\]\$PWD\[\033[0;35
 # Install Node modules when package.json changes.
 COPY ./app/package*.json ./
 RUN npm install
-
-# UPGRADE_POINT.
-# See: https://github.com/privatenumber/tsx/releases
-RUN npm install --global tsx@4.6.2
 
 # Copy all app code.
 COPY ./app/lib/ ./lib/

@@ -15,10 +15,10 @@ export const nowSlug = d.replaceAll('-', '') + '-' + t.replaceAll(':', '') // '2
 export const dbPath = '/data/db/db.sqlite'
 export const sourceRoot = '/data/src'
 
-const sessionTmpDir = `/data/tmp/${nowSlug}`
-export const dirtyRoot = `${sessionTmpDir}/dirty`
-export const reportRoot = `${sessionTmpDir}/report`
-export const testRoot = `${sessionTmpDir}/test`
+const outRoot = `/data/tmp`
+export const dirtyRoot = `${outRoot}/${nowSlug}/dirty`
+export const reportRoot = `${outRoot}/${nowSlug}/report`
+export const testRoot = `${outRoot}/_tests/${nowSlug}`
 export const scanCodeBinary = `scancode`
 export const scanCodeOutPath = `${reportRoot}/scancode.json`
 export const auditOutPath = `${reportRoot}/audit.json`

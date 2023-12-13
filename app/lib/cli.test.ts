@@ -85,23 +85,17 @@ function args(...x: string[]) {
 t.test('licenses', async (t) => {
 	const { cli, loggerOut } = await createTestCli(t.fullname)
 
-	await cli.run(args('licenses', 'allow', 'specific', 'Ruby License'))
-	await cli.run(args('licenses', 'allow', 'category', 'Permissive'))
+	await cli.run(args('licenses', 'allow', 'Ruby License'))
 	loggerOut.clearInfos()
 	await cli.run(args('licenses', 'list'))
-	t.match(loggerOut.infos[0], `Allowed specific licenses`)
+	t.match(loggerOut.infos[0], `Allowed licenses`)
 	t.match(loggerOut.infos[0], `Ruby License`)
-	t.match(loggerOut.infos[1], `Allowed license categories`)
-	t.match(loggerOut.infos[1], `Permissive`)
 
-	await cli.run(args('licenses', 'unallow', 'specific', 'Ruby License'))
-	await cli.run(args('licenses', 'unallow', 'category', 'Permissive'))
+	await cli.run(args('licenses', 'unallow', 'Ruby License'))
 	loggerOut.clearInfos()
 	await cli.run(args('licenses', 'list'))
-	t.match(loggerOut.infos[0], `Allowed specific licenses`)
+	t.match(loggerOut.infos[0], `Allowed licenses`)
 	t.notMatch(loggerOut.infos[0], `Ruby License`)
-	t.match(loggerOut.infos[1], `Allowed license categories`)
-	t.notMatch(loggerOut.infos[1], `Permissive`)
 })
 
 t.test('scan', async (t) => {
@@ -111,7 +105,7 @@ t.test('scan', async (t) => {
 	await cli.run(args('scan', '--verbose'))
 	const output = loggerOut.allInfosAsString()
 	t.match(output, `STEP 1`)
-	// expect(output).toContain(`STEP 2`)
+	t.match(output, `STEP 2`)
 	t.match(output, `STEP 3`)
 	t.match(output, `STEP 4`)
 })
@@ -123,12 +117,7 @@ t.test('audit', async (t) => {
 		file_path: 'some/file.txt',
 		content_sha256: null,
 		content_text: null,
-		licenses: JSON.stringify([
-			{
-				name: 'GPL',
-				category: '',
-			},
-		]),
+		licenses: JSON.stringify(['gpl-1.0']),
 		previous_accepted_reason: null,
 		current_accepted_reason: null,
 		current_accepted_at: null,
@@ -224,12 +213,7 @@ t.test('accept, exact', async (t) => {
 		content_text: `
 			I do enjoy some GPL madness.
 		`,
-		licenses: JSON.stringify([
-			{
-				name: 'GPL',
-				category: '',
-			},
-		]),
+		licenses: JSON.stringify(['gpl-1.0']),
 		previous_accepted_reason: null,
 		current_accepted_reason: null,
 		current_accepted_at: null,
@@ -260,12 +244,7 @@ t.test('accept, wildcard', async (t) => {
 			content_text: `
 				I do enjoy some GPL madness.
 			`,
-			licenses: JSON.stringify([
-				{
-					name: 'GPL',
-					category: '',
-				},
-			]),
+			licenses: JSON.stringify(['gpl-1.0']),
 			previous_accepted_reason: null,
 			current_accepted_reason: null,
 			current_accepted_at: null,
@@ -292,12 +271,7 @@ t.test('unaccept, exact', async (t) => {
 		content_text: `
 			I do enjoy some GPL madness.
 		`,
-		licenses: JSON.stringify([
-			{
-				name: 'GPL',
-				category: '',
-			},
-		]),
+		licenses: JSON.stringify(['gpl-1.0']),
 		previous_accepted_reason: null,
 		current_accepted_reason: 'GPL? Ok, just this thrice.',
 		current_accepted_at: 'some time',
@@ -328,12 +302,7 @@ t.test('unaccept, wildcard', async (t) => {
 			content_text: `
 				I do enjoy some GPL madness.
 			`,
-			licenses: JSON.stringify([
-				{
-					name: 'GPL',
-					category: '',
-				},
-			]),
+			licenses: JSON.stringify(['gpl-1.0']),
 			previous_accepted_reason: null,
 			current_accepted_reason: 'GPL? Ok, just this thrice.',
 			current_accepted_at: 'some time',

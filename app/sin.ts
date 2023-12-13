@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+#!/app/node_modules/.bin/tsx
 
 const label = '- Time, total';
 console.time(label);

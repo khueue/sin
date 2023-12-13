@@ -5,10 +5,19 @@ SHELL=/usr/bin/env bash
 
 # UPGRADE_POINT.
 # NOTE: Search through the repo for mentions of previous version when bumping.
-VERSION=1.0.0-beta
+VERSION=1.0.0-beta2
 IMAGE_TAG=khueue/sin:$(VERSION)
 
-install:
+# The Docker image installs its own dependencies and works without this, but
+# there are two reasons to do this:
+#
+# - To expose dependencies and types to your editor.
+# - When running a shell that bind mounts the /app folder, the node_modules
+#   folder inside the container gets overridden by what you have locally.
+#
+# NOTE: The rm is not strictly necessary, but avoids headaches when switching
+# between architectures.
+install_local:
 	rm -rf ./app/node_modules/
 	make shell cmd="npm install"
 

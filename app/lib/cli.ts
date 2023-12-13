@@ -130,59 +130,33 @@ export class Cli {
 				this.unaccept(pattern)
 			})
 
+		const descLicenseName = `ID XXXXXXXXX of specific license, e.g. 'bsd-new'`
+
 		const licenses = this.program
 			.command('licenses')
 			.description(`Manage globally allowed licenses (applied on every audit)`)
 		const licensesList = licenses
 			.command('list')
 			.description(`List accepted licenses`)
-		const licensesAllow = licenses
-			.command('allow')
-			.description(`Globally allow a license`)
-		const licensesUnallow = licenses
-			.command('unallow')
-			.description(`Globally unallow a previously allowed license`)
-
-		const descLicenseName = `Name of specific license, e.g. 'Ruby License'`
-		const descLicenseCategory = `Name of license category, e.g. 'Public Domain'`
 
 		licensesList.action(() => {
 			this.printAllowedLicenses()
 		})
 
-		licensesAllow
-			.command('specific')
-			.description(`Globally allow specific license`)
+		licenses
+			.command('allow')
+			.description(`Globally allow a license`)
 			.argument('<name>', descLicenseName)
 			.action((name: string) => {
-				this.allowSpecificLicense(name)
+				this.allowLicense(name)
 				this.printAllowedLicenses()
 			})
-
-		licensesUnallow
-			.command('specific')
-			.description(`Globally unallow specific license`)
+		licenses
+			.command('unallow')
+			.description(`Globally unallow a previously allowed license`)
 			.argument('<name>', descLicenseName)
 			.action((name: string) => {
-				this.unallowSpecificLicense(name)
-				this.printAllowedLicenses()
-			})
-
-		licensesAllow
-			.command('category')
-			.description(`Globally allow license category`)
-			.argument('<name>', descLicenseCategory)
-			.action((name: string) => {
-				this.allowLicenseCategory(name)
-				this.printAllowedLicenses()
-			})
-
-		licensesUnallow
-			.command('category')
-			.description(`Globally unallow license category`)
-			.argument('<name>', descLicenseCategory)
-			.action((name: string) => {
-				this.unallowLicenseCategory(name)
+				this.unallowLicense(name)
 				this.printAllowedLicenses()
 			})
 
@@ -231,6 +205,7 @@ export class Cli {
 				dirtyRoot: this.config.dirtyRoot,
 				logger: this.logger,
 				skipExtractArchives: this.config.skipExtractArchives ?? false,
+				verbose,
 			})
 			await step2.run()
 		} catch (e: any) {
@@ -419,7 +394,7 @@ export class Cli {
 			files.push(file)
 		}
 
-		const detective = new Detective([], [])
+		const detective = new Detective([])
 		const tree = new FileTree(Object.values(files), detective)
 		if (Object.keys(tree.root).length) {
 			const json = tree.toJson()
@@ -467,10 +442,7 @@ export class Cli {
 		reason = reason.trim()
 		const verbose = this.program.opts().verbose
 		const files: AnalysedFile[] = []
-		const detective = new Detective(
-			this.db.allowedSpecificLicenses,
-			this.db.allowedLicenseCategories,
-		)
+		const detective = new Detective(this.db.allowedLicenses)
 		for (const row of rows) {
 			const file = this.db.analysedFileRowToObject(row)
 			if (detective.fileNeedsInvestigation(file)) {
@@ -582,9 +554,9 @@ export class Cli {
 		this.logger.info(`Unaccepted: ${filePath}`)
 	}
 
-	allowSpecificLicense(name: string) {
+	allowLicense(name: string) {
 		const stmt = this.db.sqlite.prepare(`
-			INSERT INTO accepted_license_names(name) VALUES(:name)
+			INSERT INTO allowed_licenses(name) VALUES(:name)
 			ON CONFLICT(name) DO
 			UPDATE SET name = :name
 		`)
@@ -593,14 +565,14 @@ export class Cli {
 		})
 		if (!results) {
 			this.logger.error(`Something went wrong.`)
-			throw new Error(`Could not save specific license allow: ${name}`)
+			throw new Error(`Could not save license allow: ${name}`)
 		}
-		this.logger.info(`Globally accepting specific license: ${name}`)
+		this.logger.info(`Globally allowing license: ${name}`)
 	}
 
-	unallowSpecificLicense(name: string) {
+	unallowLicense(name: string) {
 		const stmt = this.db.sqlite.prepare(`
-			DELETE FROM accepted_license_names
+			DELETE FROM allowed_licenses
 			WHERE name = :name
 		`)
 		const results = stmt.run({
@@ -608,48 +580,15 @@ export class Cli {
 		})
 		if (!results) {
 			this.logger.error(`Something went wrong.`)
-			throw new Error(`Could not save license category allow: ${name}`)
+			throw new Error(`Could not save license allow: ${name}`)
 		}
-		this.logger.info(`No longer globally accepting specific license: ${name}`)
-	}
-
-	allowLicenseCategory(name: string) {
-		const stmt = this.db.sqlite.prepare(`
-			INSERT INTO accepted_license_categories(name) VALUES(:name)
-			ON CONFLICT(name) DO
-			UPDATE SET name = :name
-		`)
-		const results = stmt.run({
-			name,
-		})
-		if (!results) {
-			this.logger.error(`Something went wrong.`)
-			return
-		}
-		this.logger.info(`Globally accepting license category: ${name}`)
-	}
-
-	unallowLicenseCategory(name: string) {
-		const stmt = this.db.sqlite.prepare(`
-			DELETE FROM accepted_license_categories
-			WHERE name = :name
-		`)
-		const results = stmt.run({
-			name,
-		})
-		if (!results) {
-			this.logger.error(`Something went wrong.`)
-			return
-		}
-		this.logger.info(`No longer globally accepting license category: ${name}`)
+		this.logger.info(`No longer globally accepting license: ${name}`)
 	}
 
 	printAllowedLicenses() {
 		this.db.loadGlobalSettings()
-		const names = this.db.allowedSpecificLicenses
-		const categories = this.db.allowedLicenseCategories
-		this.logger.info(`Allowed specific licenses:`, names)
-		this.logger.info(`Allowed license categories:`, categories)
+		const names = this.db.allowedLicenses
+		this.logger.info(`Allowed licenses:`, names)
 	}
 
 	async listAttributions() {

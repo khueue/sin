@@ -7,7 +7,7 @@
 		"pretty": "prettier --write ./**/*.ts ./**/*.json ./**/*.mjs",
 		"typecheck": "tsc --noEmit",
 		"cov-report": "tap report html --allow-incomplete-coverage",
-		"test": "npm run typecheck && npm run pretty && tap --allow-incomplete-coverage && npm run cov-report"
+		"test": "npm run typecheck && npm run pretty && tap --jobs 4 --allow-incomplete-coverage && npm run cov-report"
 	},
 	"// UPGRADE_POINT": {},
 	"dependencies": {
@@ -20,6 +20,7 @@
 		"prettier": "3.1.1",
 		"prettier-plugin-organize-imports": "3.2.4",
 		"tap": "18.6.1",
+		"tsx": "4.6.2",
 		"typescript": "5.3.3",
 		"zx": "7.2.3"
 	}

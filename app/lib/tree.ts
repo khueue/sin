@@ -66,7 +66,7 @@ export class FileTree {
 			if (this.isFileNode(value)) {
 				const fileName = basename(value.filePath).toLowerCase()
 				if (value.isLegalDocument && fileName.includes('license')) {
-					if (this.detective.allLicensesAreAccepted(value.licenses)) {
+					if (this.detective.allLicensesAreAllowed(value.licenses)) {
 						return true
 					}
 				}

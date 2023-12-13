@@ -15,8 +15,7 @@ interface Config {
 export class LocalDatabase {
 	sqlite: DatabaseT
 	logger: BasicLogger
-	allowedSpecificLicenses: string[] = []
-	allowedLicenseCategories: string[] = []
+	allowedLicenses: string[] = []
 	stmtInsertFile: Statement
 	stmtUpdateFile: Statement
 
@@ -104,14 +103,7 @@ export class LocalDatabase {
 		`)
 
 		this.sqlite.exec(`
-			CREATE TABLE IF NOT EXISTS accepted_license_categories
-			(
-				name TEXT PRIMARY KEY
-			)
-		`)
-
-		this.sqlite.exec(`
-			CREATE TABLE IF NOT EXISTS accepted_license_names
+			CREATE TABLE IF NOT EXISTS allowed_licenses
 			(
 				name TEXT PRIMARY KEY
 			)
@@ -121,8 +113,7 @@ export class LocalDatabase {
 	}
 
 	loadGlobalSettings() {
-		this.allowedSpecificLicenses = this.fetchAllowedSpecificLicenses()
-		this.allowedLicenseCategories = this.fetchAllowedLicenseCategories()
+		this.allowedLicenses = this.fetchAllowedLicenses()
 	}
 
 	fetchAllAnalysedFiles() {
@@ -225,25 +216,10 @@ export class LocalDatabase {
 		}
 	}
 
-	fetchAllowedSpecificLicenses() {
+	fetchAllowedLicenses() {
 		const stmt = this.sqlite.prepare(`
 			SELECT name
-			FROM accepted_license_names
-		`)
-		const rows = stmt.all() as {
-			name: string
-		}[]
-		const names = []
-		for (const row of rows) {
-			names.push(row.name)
-		}
-		return names
-	}
-
-	fetchAllowedLicenseCategories() {
-		const stmt = this.sqlite.prepare(`
-			SELECT name
-			FROM accepted_license_categories
+			FROM allowed_licenses
 		`)
 		const rows = stmt.all() as {
 			name: string
