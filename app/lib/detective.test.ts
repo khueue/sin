@@ -38,7 +38,7 @@ t.test('suspicious files', async (t) => {
 
 	file = {
 		filePath: 'some/file.txt',
-		licenses: ['mit OR gpl-1.0-plus'],
+		licenses: ['mit', 'gpl-1.0-plus'],
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
 	t.match(suspicious, true)

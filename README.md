@@ -1,7 +1,7 @@
 # Sin
 
 ![release](https://img.shields.io/badge/release-1.0.0-green)
-![coverage](https://img.shields.io/badge/coverage-91%25-green)
+![coverage](https://img.shields.io/badge/coverage-90%25-green)
 
 _Keep track of sinful license usage._
 

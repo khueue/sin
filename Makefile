@@ -5,7 +5,7 @@ SHELL=/usr/bin/env bash
 
 # UPGRADE_POINT.
 # NOTE: Search through the repo for mentions of previous version when bumping.
-VERSION=1.0.0-beta2
+VERSION=1.0.0-beta3
 IMAGE_TAG=khueue/sin:$(VERSION)
 
 # The Docker image installs its own dependencies and works without this, but
