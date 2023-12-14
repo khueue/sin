@@ -125,10 +125,18 @@ t.test('audit', async (t) => {
 	})
 
 	loggerOut.clearInfos()
-	await cli.run(args('audit', '--verbose'))
-	const output = loggerOut.allInfosAsString()
-	t.match(output, `Investigation saved`)
-	t.match(output, `found 1`)
+	try {
+		await cli.run(args('audit', '--verbose'))
+		t.fail('should have thrown')
+	} catch (e: unknown) {
+		if (e instanceof Error && e.message === 'graceful.audit_with_findings') {
+			const output = loggerOut.allInfosAsString()
+			t.match(output, `Investigation saved`)
+			t.match(output, `found 1`)
+		} else {
+			t.fail('threw wrong error type')
+		}
+	}
 })
 
 t.test('accepted, csv', async (t) => {

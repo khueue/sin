@@ -7,7 +7,7 @@
 		"pretty": "prettier --write ./**/*.ts ./**/*.json ./**/*.mjs",
 		"typecheck": "tsc --noEmit",
 		"cov-report": "tap report html --allow-incomplete-coverage",
-		"test": "npm run typecheck && npm run pretty && tap --jobs 4 --allow-incomplete-coverage && npm run cov-report"
+		"test": "npm run pretty && npm run typecheck && tap --jobs 4 --allow-incomplete-coverage && npm run cov-report"
 	},
 	"// UPGRADE_POINT": {},
 	"dependencies": {

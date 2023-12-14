@@ -277,7 +277,10 @@ export class Cli {
 			logger: this.logger,
 			verbose: options.verbose ?? false,
 		})
-		await step5.run()
+		const auditTree = await step5.run()
+		if (auditTree.countLeaves()) {
+			throw new Error('graceful.audit_with_findings')
+		}
 	}
 
 	async saveFile(path: string, contents: string) {

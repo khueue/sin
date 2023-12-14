@@ -67,18 +67,27 @@ export class ScanStep4 {
 				const licenses = new Set<string>()
 				scannedFile.license_detections.map((detection) => {
 					detection.matches.map((match) => {
-						licenses.add(match.license_expression)
+						const orParts = match.license_expression.split(' OR ')
+						const andParts = match.license_expression.split(' AND ')
+						if (orParts.length > 1) {
+							orParts.map((license) => licenses.add(license))
+						} else if (andParts.length > 1) {
+							andParts.map((license) => licenses.add(license))
+						} else {
+							licenses.add(match.license_expression)
+						}
 					})
 				})
 				if (licenses.size) {
 					file.licenses = Array.from(licenses.values()).sort()
 
-					// Save file contents only if we have license findings.
-					const contentText = await readFile(
-						`${this.dirtyRoot}/${file.filePath}`,
-						'utf-8',
-					)
-					file.contentText = contentText
+					// Don't do this anymore, since it really bloats the db:
+					// // Save file contents only if we have license findings.
+					// const contentText = await readFile(
+					// 	`${this.dirtyRoot}/${file.filePath}`,
+					// 	'utf-8',
+					// )
+					// file.contentText = contentText
 				}
 
 				file.isLegalDocument = Boolean(scannedFile.is_legal)
