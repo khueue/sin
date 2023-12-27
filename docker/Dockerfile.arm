@@ -1,3 +1,7 @@
+# NOTE: This Dockerfile is experimental. Caveats:
+# - Only ScanCode version 32.0.2 seems to work.
+# - Extractcode does not work.
+
 # UPGRADE_POINT.
 # See: https://hub.docker.com/_/python/
 # NOTE: Match with ScanCode's Python requirements:
