@@ -78,10 +78,8 @@ export class Cli {
 		this.program
 			.command('audit')
 			.description(`Generate report of suspicious files`)
-			.option(
-				'--verbose',
-				'Run on-the-fly ScanCode analysis showing more detailed license info for each finding',
-			)
+			.option('--verbose', 'Include ScanCode analysis for each finding')
+			.option('--print', 'Print entire audit to screen')
 			.action(async (options: any) => {
 				await this.audit(options)
 			})
@@ -130,7 +128,10 @@ export class Cli {
 				this.unaccept(pattern)
 			})
 
-		const descLicenseName = `ID XXXXXXXXX of specific license, e.g. 'bsd-new'`
+		const descLicenseName = [
+			`Key of specific license, e.g. 'bsd-new'`,
+			`See: https://scancode-licensedb.aboutcode.org/`,
+		].join('\n')
 
 		const licenses = this.program
 			.command('licenses')
@@ -276,6 +277,7 @@ export class Cli {
 			scanCodeBinary: this.config.scanCodeBinary,
 			logger: this.logger,
 			verbose: options.verbose ?? false,
+			print: options.print,
 		})
 		const auditTree = await step5.run()
 		if (auditTree.countLeaves()) {

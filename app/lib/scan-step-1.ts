@@ -75,7 +75,7 @@ export class ScanStep1 {
 				promises.push(promise)
 			}
 		}
-		// @todo XXX Use something like p-limit to limit concurrency?
+		// @todo Use something like p-limit to limit concurrency?
 		return Promise.all(promises)
 	}
 

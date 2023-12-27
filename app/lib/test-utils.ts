@@ -87,6 +87,7 @@ export async function prepareSourceFiles(
 				file_path: file.filePath,
 				content_sha256: sha256,
 				content_text: null,
+				scancode_entry: null,
 				licenses: null,
 				previous_accepted_reason: null,
 				current_accepted_reason: null,

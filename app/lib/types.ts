@@ -7,6 +7,7 @@ export interface AnalysedFile {
 	currentAcceptedAt?: Date
 	isLegalDocument?: boolean
 	licenses?: string[]
+	scanCodeEntry?: ScanCodeEntry
 	dirty?: boolean // Used to determine if file is new/modified.
 }
 
@@ -19,6 +20,7 @@ export interface AnalysedFileRow {
 	current_accepted_at?: string // Date as string.
 	is_legal_document?: number // Boolean as 1 or 0.
 	licenses?: string // Licenses as stringified JSON list.
+	scancode_entry?: string // ScanCode entry as stringified JSON object.
 }
 
 // Subset of what ScanCode generates for each file.
@@ -27,9 +29,11 @@ export interface ScanCodeEntry {
 	type: string // File type.
 	sha256: string // SHA256 of content.
 	is_legal?: boolean // Considered a legal document (e.g. license file).
-	license_detections: {
+	is_text?: boolean // Textual.
+	license_detections?: {
 		matches: {
 			license_expression: string
+			matched_text: string
 		}[]
 	}[]
 }

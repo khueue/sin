@@ -3,7 +3,7 @@ import { basename } from 'path'
 import type { Detective } from './detective.js'
 import type { AnalysedFile } from './types.js'
 
-// @todo XXX Proper recursive type with AnalysedFile as leaf?
+// @todo Proper recursive type with AnalysedFile as leaf?
 export type TreeNode = Record<string, any>
 
 export class FileTree {

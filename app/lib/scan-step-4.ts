@@ -63,6 +63,8 @@ export class ScanStep4 {
 			}
 
 			if (scannedFile.license_detections?.length) {
+				file.isLegalDocument = Boolean(scannedFile.is_legal)
+
 				// Gather and de-duplicate license findings.
 				const licenses = new Set<string>()
 				scannedFile.license_detections.map((detection) => {
@@ -80,17 +82,17 @@ export class ScanStep4 {
 				})
 				if (licenses.size) {
 					file.licenses = Array.from(licenses.values()).sort()
+					file.scanCodeEntry = scannedFile
 
-					// Don't do this anymore, since it really bloats the db:
-					// // Save file contents only if we have license findings.
-					// const contentText = await readFile(
-					// 	`${this.dirtyRoot}/${file.filePath}`,
-					// 	'utf-8',
-					// )
-					// file.contentText = contentText
+					// Save file contents only for textual files.
+					if (scannedFile.is_text) {
+						const contentText = await readFile(
+							`${this.dirtyRoot}/${file.filePath}`,
+							'utf-8',
+						)
+						file.contentText = contentText
+					}
 				}
-
-				file.isLegalDocument = Boolean(scannedFile.is_legal)
 			}
 
 			const exists = Boolean(this.previouslyAnalysedFiles[file.filePath])

@@ -58,7 +58,7 @@ t.test('scan dirty files', async (t) => {
 	const scannedFiles: ScanCodeEntry[] = JSON.parse(reportContents).files
 	for (const dirtyFile of initialDirtyFiles) {
 		const scanEntry = getScanCodeEntry(scannedFiles, dirtyFile.filePath)
-		const numLicenseFindings = scanEntry.license_detections.length
+		const numLicenseFindings = scanEntry.license_detections?.length
 		if (dirtyFile.shouldHaveLicenseFindings) {
 			t.ok(numLicenseFindings)
 		} else {

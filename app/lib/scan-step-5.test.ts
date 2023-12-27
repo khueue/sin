@@ -32,6 +32,25 @@ t.test('audit', async (t) => {
 				MIT License // line 3
 			`,
 			licenses: ['gpl-1.0', 'mit'],
+			scanCodeEntry: {
+				path: '',
+				sha256: '',
+				type: '',
+				license_detections: [
+					{
+						matches: [
+							{
+								license_expression: 'gpl-1.0',
+								matched_text: 'GPL License // line 2',
+							},
+							{
+								license_expression: 'mit',
+								matched_text: 'MIT License // line 3',
+							},
+						],
+					},
+				],
+			},
 		},
 		{
 			filePath: 'a1/permissive-only.txt',
@@ -56,18 +75,19 @@ t.test('audit', async (t) => {
 		scanCodeBinary: testConf.scanCodeBinary,
 		auditOutPath: testConf.auditOutPath,
 		verbose: true,
+		print: false,
 	})
 	const auditTree = await step.run()
 
 	const countFindings = auditTree.countLeaves()
 	t.match(countFindings, 1)
 
-	const detailedReport = auditTree.root['a1']['with-gpl.txt'].scanCodeReport
+	const scanCodeEntry = auditTree.root['a1']['with-gpl.txt'].scanCodeEntry
 
-	const gplFinding = detailedReport.license_detections[0].matches[0]
+	const gplFinding = scanCodeEntry.license_detections[0].matches[0]
 	t.match(gplFinding.matched_text, 'GPL License // line 2')
 
-	const mitFinding = detailedReport.license_detections[0].matches[1]
+	const mitFinding = scanCodeEntry.license_detections[0].matches[1]
 	t.match(mitFinding.matched_text, 'MIT License // line 3')
 })
 

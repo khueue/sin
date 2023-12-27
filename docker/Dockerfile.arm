@@ -5,7 +5,10 @@
 FROM --platform=linux/arm64 python:3.11.7-bookworm
 
 RUN apt update
-RUN pip install --upgrade pip
+
+# Useful for browsing files and the database.
+RUN apt install -y less
+RUN apt install -y sqlite3
 
 # UPGRADE_POINT.
 # See: https://github.com/nodesource/distributions/blob/master/README.md#installation-instructions
@@ -17,23 +20,6 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesourc
 RUN apt update
 RUN apt install -y nodejs
 
-# Useful for browsing files and the database.
-RUN apt install -y less
-RUN apt install -y sqlite3
-
-# NOTE: This (and only this) seems to work on ARM:
-# See: https://github.com/nexB/scancode-toolkit/releases
-RUN pip install scancode-toolkit==32.0.2
-# RUN pip install extractcode
-
-WORKDIR /app
-
-# Run CLI tool from anywhere.
-ENV PATH=/app:${PATH}
-
-# Ignore irrelevant ScanCode warnings.
-ENV PYTHONWARNINGS="ignore"
-
 # Give Node more space.
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
@@ -43,7 +29,22 @@ RUN apt install -y bash-completion
 RUN echo '[[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && . /usr/share/bash-completion/bash_completion' >> ~/.bashrc
 RUN echo 'export PS1="\n🐳 \[\033[1;36m\]sin.ts \[\033[1;34m\]\$PWD\[\033[0;35m\]\n\[\033[1;36m\]$ \[\033[0m\]"' >> ~/.bashrc
 
-# Install Node modules when package.json changes.
+#RUN pip install --upgrade pip
+
+# UPGRADE_POINT.
+# See: https://github.com/nexB/scancode-toolkit/releases
+# NOTE: This (and only this) seems to work on ARM:
+RUN pip install scancode-toolkit==32.0.2
+# RUN pip install extractcode
+
+# Ignore irrelevant ScanCode warnings.
+ENV PYTHONWARNINGS="ignore"
+
+# Run CLI tool from anywhere.
+WORKDIR /app
+ENV PATH=/app:${PATH}
+
+# Update modules when needed.
 COPY ./app/package*.json ./
 RUN npm install
 

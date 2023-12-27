@@ -51,6 +51,7 @@ export class LocalDatabase {
 				:file_path,
 				:content_sha256,
 				:content_text,
+				:scancode_entry,
 				:licenses,
 				:previous_accepted_reason,
 				:current_accepted_reason,
@@ -65,6 +66,7 @@ export class LocalDatabase {
 				content_sha256 = :content_sha256,
 				content_text = :content_text,
 				licenses = :licenses,
+				scancode_entry = :scancode_entry,
 				previous_accepted_reason = current_accepted_reason,
 				current_accepted_reason = NULL,
 				current_accepted_at = NULL,
@@ -94,6 +96,7 @@ export class LocalDatabase {
 				file_path TEXT PRIMARY KEY,
 				content_sha256 TEXT,
 				content_text TEXT,
+				scancode_entry TEXT,
 				licenses TEXT,
 				previous_accepted_reason TEXT,
 				current_accepted_reason TEXT,
@@ -117,7 +120,6 @@ export class LocalDatabase {
 	}
 
 	fetchAllAnalysedFiles() {
-		// NOTE: Skipping content_text, because it's big and irrelevant.
 		const stmt = this.sqlite.prepare(`
 			SELECT
 				file_path,
@@ -132,17 +134,19 @@ export class LocalDatabase {
 		return this.fetchAnalysedFiles(stmt)
 	}
 
-	fetchAnalysedFilesNeedingInvestigation() {
-		// NOTE: Skipping content_text, because it's big and irrelevant.
+	fetchAnalysedFilesNeedingInvestigation(verbose: boolean) {
+		const columns = [
+			'file_path',
+			// 'content_sha256',
+			'licenses',
+			'previous_accepted_reason',
+			'current_accepted_reason',
+			'current_accepted_at',
+			'is_legal_document',
+			...(verbose ? ['scancode_entry'] : []),
+		].join(', ')
 		const stmt = this.sqlite.prepare(`
-			SELECT
-				file_path,
-				content_sha256,
-				licenses,
-				previous_accepted_reason,
-				current_accepted_reason,
-				current_accepted_at,
-				is_legal_document
+			SELECT ${columns}
 			FROM analysed_files
 			WHERE licenses IS NOT NULL
 			AND current_accepted_reason IS NULL
@@ -186,6 +190,9 @@ export class LocalDatabase {
 		if (row.previous_accepted_reason) {
 			file.previousAcceptedReason = row.previous_accepted_reason
 		}
+		if (row.scancode_entry) {
+			file.scanCodeEntry = JSON.parse(row.scancode_entry)
+		}
 		return file
 	}
 
@@ -194,11 +201,15 @@ export class LocalDatabase {
 		const licenses = file.licenses?.length
 			? JSON.stringify(file.licenses)
 			: null
+		const scanCodeEntry = file.scanCodeEntry
+			? JSON.stringify(file.scanCodeEntry)
+			: null
 		if (exists) {
 			this.stmtUpdateFile.run({
 				file_path: file.filePath,
 				content_sha256: file.contentSha256,
 				content_text: file.contentText,
+				scancode_entry: scanCodeEntry,
 				licenses,
 				is_legal_document: isLegalDocument,
 			})
@@ -207,6 +218,7 @@ export class LocalDatabase {
 				file_path: file.filePath,
 				content_sha256: file.contentSha256,
 				content_text: file.contentText,
+				scancode_entry: scanCodeEntry,
 				licenses,
 				previous_accepted_reason: null,
 				current_accepted_reason: null,

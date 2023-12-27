@@ -29,17 +29,29 @@ export class ScanStep2 {
 			chalk.yellow(`=== STEP 2: Extract any archives among dirty files`),
 		)
 
+		const extractcodeBinaryPath = 'extractcode'
+
 		if (!existsSync(this.dirtyRoot)) {
 			this.logger.info(`Nothing to be done (no dirty files).`)
 			return
 		}
 		if (this.skipExtractArchives) {
-			this.logger.info(chalk.red(`SKIPPING extracting archives.`))
+			this.logger.info(
+				chalk.red(`SKIPPING extracting archives (due to config).`),
+			)
+			return
+		}
+		try {
+			await $`which ${extractcodeBinaryPath}`
+		} catch (e: unknown) {
+			this.logger.info(
+				chalk.red(`SKIPPING extracting archives (extractcode not found).`),
+			)
 			return
 		}
 
 		const verboseFlag = this.verbose ? '--verbose' : ''
-		const cmd = ['extractcode', verboseFlag, this.dirtyRoot]
+		const cmd = [extractcodeBinaryPath, verboseFlag, this.dirtyRoot]
 		await $`${cmd}`
 	}
 }

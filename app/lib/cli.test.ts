@@ -117,6 +117,7 @@ t.test('audit', async (t) => {
 		file_path: 'some/file.txt',
 		content_sha256: null,
 		content_text: null,
+		scancode_entry: null,
 		licenses: JSON.stringify(['gpl-1.0']),
 		previous_accepted_reason: null,
 		current_accepted_reason: null,
@@ -146,6 +147,7 @@ t.test('accepted, csv', async (t) => {
 		file_path: 'some/accepted.txt',
 		content_sha256: null,
 		content_text: null,
+		scancode_entry: null,
 		licenses: null,
 		previous_accepted_reason: null,
 		current_accepted_reason: 'Looks good!',
@@ -172,6 +174,7 @@ t.test('accepted, json', async (t) => {
 		file_path: 'some/accepted.txt',
 		content_sha256: null,
 		content_text: null,
+		scancode_entry: null,
 		licenses: null,
 		previous_accepted_reason: null,
 		current_accepted_reason: 'Looks good!',
@@ -197,6 +200,7 @@ t.test('view', async (t) => {
 		content_text: `
 			Content is king!
 		`,
+		scancode_entry: null,
 		licenses: null,
 		previous_accepted_reason: null,
 		current_accepted_reason: null,
@@ -221,6 +225,7 @@ t.test('accept, exact', async (t) => {
 		content_text: `
 			I do enjoy some GPL madness.
 		`,
+		scancode_entry: null,
 		licenses: JSON.stringify(['gpl-1.0']),
 		previous_accepted_reason: null,
 		current_accepted_reason: null,
@@ -252,6 +257,7 @@ t.test('accept, wildcard', async (t) => {
 			content_text: `
 				I do enjoy some GPL madness.
 			`,
+			scancode_entry: null,
 			licenses: JSON.stringify(['gpl-1.0']),
 			previous_accepted_reason: null,
 			current_accepted_reason: null,
@@ -279,6 +285,7 @@ t.test('unaccept, exact', async (t) => {
 		content_text: `
 			I do enjoy some GPL madness.
 		`,
+		scancode_entry: null,
 		licenses: JSON.stringify(['gpl-1.0']),
 		previous_accepted_reason: null,
 		current_accepted_reason: 'GPL? Ok, just this thrice.',
@@ -310,6 +317,7 @@ t.test('unaccept, wildcard', async (t) => {
 			content_text: `
 				I do enjoy some GPL madness.
 			`,
+			scancode_entry: null,
 			licenses: JSON.stringify(['gpl-1.0']),
 			previous_accepted_reason: null,
 			current_accepted_reason: 'GPL? Ok, just this thrice.',

@@ -34,18 +34,18 @@ t.test('non-empty tree', async (t) => {
 		a1: {
 			a2: {
 				a3: {
-					file1: {
+					file1: <AnalysedFile>{
 						filePath: 'a1/a2/a3/file1',
 					},
-					file2: {
+					file2: <AnalysedFile>{
 						filePath: 'a1/a2/a3/file2',
 					},
 				},
-				file3: {
+				file3: <AnalysedFile>{
 					filePath: 'a1/a2/file3',
 				},
 			},
-			file4: {
+			file4: <AnalysedFile>{
 				filePath: 'a1/file4',
 			},
 		},
@@ -58,20 +58,20 @@ t.test('prune recursive under okay license file', async (t) => {
 	tree.root = {
 		a1: {
 			a2: {
-				LICENSE: {
+				LICENSE: <AnalysedFile>{
 					filePath: 'a1/a2/LICENSE',
 					isLegalDocument: true,
 					licenses: ['ruby'],
 				},
-				file2: {
+				file2: <AnalysedFile>{
 					filePath: 'a1/a2/file2',
 				},
 			},
-			file3: {
+			file3: <AnalysedFile>{
 				filePath: 'a1/file3',
 			},
 		},
-		file4: {
+		file4: <AnalysedFile>{
 			filePath: 'file4',
 		},
 	}
@@ -80,11 +80,11 @@ t.test('prune recursive under okay license file', async (t) => {
 	t.match(tree.root, {
 		a1: {
 			// a2 is gone.
-			file3: {
+			file3: <AnalysedFile>{
 				filePath: 'a1/file3',
 			},
 		},
-		file4: {
+		file4: <AnalysedFile>{
 			filePath: 'file4',
 		},
 	})
@@ -96,7 +96,7 @@ t.test('prune empty nodes', async (t) => {
 	tree.root = {
 		a1: {
 			a2: {},
-			file3: {
+			file3: <AnalysedFile>{
 				filePath: 'a1/file3',
 			},
 		},
@@ -111,7 +111,7 @@ t.test('prune empty nodes', async (t) => {
 	t.match(tree.root, {
 		a1: {
 			// a2 is gone.
-			file3: {
+			file3: <AnalysedFile>{
 				filePath: 'a1/file3',
 			},
 		},

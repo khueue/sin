@@ -50,6 +50,7 @@ export class ScanStep3 {
 			'--info', // Gives sha256 of file contents.
 			'--license', // Gives license information.
 			'--classify', // Gives is_legal flag.
+			'--license-text', // Gives a copy of the suspicious lines.
 			'--json-pp',
 			this.scanCodeOutPath,
 			this.dirtyRoot,
