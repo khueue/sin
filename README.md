@@ -1,7 +1,7 @@
 # Sin
 
-![release](https://img.shields.io/badge/release-0.0.6-green)
-![coverage](https://img.shields.io/badge/coverage-88%25-green)
+![release](https://img.shields.io/badge/release-1.0.0-green)
+![coverage](https://img.shields.io/badge/coverage-90%25-green)
 
 _Keep track of sinful license usage._
 
@@ -22,7 +22,7 @@ Features:
 -  **Simple database** - Manages a simple SQLite database that can be easily
    browsed or consumed by other tools.
 
-Sin has been tested on a codebase with over 300k files:
+Sin has been tested on a multi-repo codebase with over 300k files:
 
 -  Initial scan: ~6 hours.
 -  Subsequent scans: ~10 minutes (assuming that not many files have changed).
@@ -41,7 +41,7 @@ Docker images available on Docker Hub:
 
 ## Input to Sin
 
-Sin runs in a docker container, and uses the following directories:
+Sin runs in a docker container, and uses the following directories inside:
 
 -  `/data/src`. Sin assumes that this dir contains all files that you wish to
    scan, **including installed dependencies**. Make sure everything is
@@ -56,9 +56,19 @@ Sin runs in a docker container, and uses the following directories:
 -  `/data/tmp` _(optional)_. Sin creates a timestamped workspace inside this dir
    every time it's invoked, where all temporary files and reports are stored.
    Mount this folder if you wish to expose these files to your host (useful
-   for debugging etc.).
+   for debugging, auditing etc.).
 
-## Example
+## Example 1: Try it out
+
+1. Clone this repo and cd into it.
+2. Run: `make install_local shell`.
+3. Inside the container, run commands like:
+   -  `sin.ts scan --verbose` - Perform scan on "bogus" source code under ./examples.
+   -  `sin.ts audit --print` - Generate an "audit" file that lists suspicions.
+   -  `sin.ts licenses allow 'apache-2.0'` - Accept MIT license.
+   -  `sin.ts audit --print` - Audit again, this time ignoring everything under Apache 2.0.
+
+## Example 2: More realistic
 
 Make sure the dirs to be mounted exist on the host:
 
@@ -81,11 +91,11 @@ docker run --interactive --tty --rm --init \
    --mount type="bind",source="$(PWD)/sin-data/db",target="/data/db",consistency="delegated" \
    --mount type="bind",source="$(PWD)/sin-data/tmp",target="/data/tmp",consistency="delegated" \
    --mount type="bind",source="$(PWD)/sin-data/src",target="/data/src",readonly \
-   khueue/sin:0.0.6
+   khueue/sin:1.0.0
 ```
 
 The above command will place you inside a bash shell, allowing you to run
-the tool, `sin.ts`:
+the tool, `sin.ts` (where all subcommands accept the `-h` flag):
 
 ```bash
 $ sin.ts
@@ -108,12 +118,15 @@ Commands:
   help [command]             display help for command
 ```
 
+## Limitations
+
+-  There is currently no ARM support (because ScanCode does not support it).
+
 ## Tips
 
 -  The bulk of the scan time is spent running ScanCode. Give as many CPUs
    as you can to Docker, since ScanCode is very good at saturating every
    available CPU.
-
 
 # Auditing
 
@@ -129,19 +142,31 @@ The `sin.ts audit` tool gathers a report according to the following:
       licenses, exclude it.
 -  The remainder is a set of files that needs looking into.
 
+The audit tool accepts the following flags:
+
+-  `--verbose` - Include the full ScanCode report for each file.
+-  `--print` - Print the audit on screen (in addition to an out file).
+
 ## Automatic Acceptance
 
-The engine is configured to accept licenses using two settings:
+XXX Wrong since 1.0.0:
 
--  By category, such as "permissive" licenses.
--  By name, allowing specific licenses such as "Ruby License".
-
-These globally accepted licenses are stored in the database, applied on-the-fly
-on every `sin.ts audit`, and managed by `sin.ts licenses`.
-
-Refer to "Short name" and "Category" in:
+The engine is configured to allow specific licenses, referenced by "Key" in:
 
 -  https://scancode-licensedb.aboutcode.org/
+
+These acceptances are stored in the database, applied on-the-fly on every
+`sin.ts audit`, and managed by `sin.ts licenses`. This means that it's
+simple to go back and forth with accepting and unaccepting licenses and then
+re-auditing as needed.
+
+Examples:
+
+```bash
+sin.ts licenses list
+sin.ts licenses allow 'bsd-new'
+sin.ts licenses unallow 'bsd-new'
+```
 
 ## Manual Acceptance
 
@@ -150,7 +175,29 @@ and take decisions from there. For these situations, files can be marked as
 "accepted" using the `sin.ts accept` tool.
 
 Marking as "accepted" essentially sets a flag in the database for a particular
-file, omitting it from future audits. Important to know is that if a file
-that has been marked as accepted _changes_, that flag will be removed so that
-the file can start showing up in reports again. It is possible to revert
-accepts by running `sin.ts unaccept`.
+file, omitting it from future audits. Important to know is that if the contents
+of a file that has been marked as accepted ever changes, that flag will be
+removed so that the file can start showing up in reports again.
+
+It is possible to revert any accepts by running `sin.ts unaccept`.
+
+Examples:
+
+```bash
+sin.ts accepted
+sin.ts accept repo1/dir2/dir3/mit-and-gpl.txt 'This file seems fine'
+sin.ts unaccept repo1/dir2/dir3/mit-and-gpl.txt
+sin.ts accept 'repo1/dir2/dir3/%' 'This whole folder is okay'
+```
+
+## Tips and Tricks
+
+To help with your investigation, Sin always saves two additional things when
+it finds potential license findings:
+
+-  The entire contents of the file. The file can be viewed by running
+   `sin.ts view <path>` (which you can pipe to less). This is especially useful
+   if the file in question is the result of a decompressed archive inside
+   your dependency tree.
+-  The ScanCode report for the file. This is shown when running an audit with
+   the `--verbose` flag.

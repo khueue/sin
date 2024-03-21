@@ -1,9 +1,10 @@
 import { createHash } from 'crypto'
 import { copyFile, mkdir, readFile, writeFile } from 'fs/promises'
-import { basename, dirname } from 'path'
-import type { LocalDatabase } from './db'
-import { testRoot } from './defaults'
-import type { BasicLogger } from './types'
+import { dirname } from 'path'
+
+import type { LocalDatabase } from './db.js'
+import { testRoot } from './defaults.js'
+import type { BasicLogger } from './types.js'
 
 interface TestConfig {
 	logger: BasicLogger
@@ -15,6 +16,7 @@ interface TestConfig {
 	nowIso: string
 	nowSlug: string
 	dbPath: string
+	scanCodeBinary: string
 	scanCodeOutPath: string
 	auditOutPath: string
 	acceptedOutPath: string
@@ -40,14 +42,8 @@ export function testLogger() {
 	}
 }
 
-export async function createTestConfig() {
-	const testId = [
-		basename(expect.getState().testPath),
-		expect
-			.getState()
-			.currentTestName.toLowerCase()
-			.replace(/[^0-9a-z]+/g, '-'),
-	].join('-')
+export async function createTestConfig(fullname: string) {
+	const testId = fullname.toLowerCase().replace(/[^0-9a-z]+/g, '-')
 	const sessionDir = `${testRoot}/${testId}`
 	const dbRoot = `${sessionDir}/db`
 	const dirtyRoot = `${sessionDir}/dirty`
@@ -63,6 +59,7 @@ export async function createTestConfig() {
 		dirtyRoot,
 		reportRoot,
 		sourceRoot,
+		scanCodeBinary: `scancode`,
 		scanCodeOutPath: `${reportRoot}/scancode.json`,
 		auditOutPath: `${reportRoot}/audit.json`,
 		acceptedOutPath: `${reportRoot}/accepted.json`,
@@ -90,6 +87,7 @@ export async function prepareSourceFiles(
 				file_path: file.filePath,
 				content_sha256: sha256,
 				content_text: null,
+				scancode_entry: null,
 				licenses: null,
 				previous_accepted_reason: null,
 				current_accepted_reason: null,

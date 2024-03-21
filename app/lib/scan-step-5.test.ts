@@ -1,11 +1,13 @@
+import t from 'tap'
 import { $ } from 'zx'
-import { LocalDatabase } from './db'
-import { ScanStep5 } from './scan-step-5'
-import { createTestConfig, testLogger } from './test-utils'
-import type { AnalysedFile } from './types'
 
-test('audit', async () => {
-	const testConf = await createTestConfig()
+import { LocalDatabase } from './db.js'
+import { ScanStep5 } from './scan-step-5.js'
+import { createTestConfig, testLogger } from './test-utils.js'
+import type { AnalysedFile } from './types.js'
+
+t.test('audit', async (t) => {
+	const testConf = await createTestConfig(t.fullname)
 	const logger = testLogger()
 	$.verbose = false
 
@@ -13,8 +15,7 @@ test('audit', async () => {
 		sqlitePath: testConf.dbPath,
 		logger,
 	})
-	db.allowedSpecificLicenses = ['Ruby License']
-	db.allowedLicenseCategories = ['Permissive']
+	db.allowedLicenses = ['ruby', 'mit', 'bsd-new']
 
 	const dbFiles: AnalysedFile[] = [
 		{
@@ -22,12 +23,7 @@ test('audit', async () => {
 			contentText: `
 				Ruby License
 			`,
-			licenses: [
-				{
-					name: 'Ruby License',
-					category: '',
-				},
-			],
+			licenses: ['ruby'],
 		},
 		{
 			filePath: 'a1/with-gpl.txt',
@@ -35,16 +31,26 @@ test('audit', async () => {
 				GPL License // line 2
 				MIT License // line 3
 			`,
-			licenses: [
-				{
-					name: 'GPL',
-					category: 'Copyleft',
-				},
-				{
-					name: 'MIT',
-					category: 'Permissive',
-				},
-			],
+			licenses: ['gpl-1.0', 'mit'],
+			scanCodeEntry: {
+				path: '',
+				sha256: '',
+				type: '',
+				license_detections: [
+					{
+						matches: [
+							{
+								license_expression: 'gpl-1.0',
+								matched_text: 'GPL License // line 2',
+							},
+							{
+								license_expression: 'mit',
+								matched_text: 'MIT License // line 3',
+							},
+						],
+					},
+				],
+			},
 		},
 		{
 			filePath: 'a1/permissive-only.txt',
@@ -52,16 +58,7 @@ test('audit', async () => {
 				MIT
 				BSD
 			`,
-			licenses: [
-				{
-					name: 'MIT',
-					category: 'Permissive',
-				},
-				{
-					name: 'BSD',
-					category: 'Permissive',
-				},
-			],
+			licenses: ['mit', 'bsd-new'],
 		},
 		{
 			filePath: 'a2/nonsense.txt',
@@ -75,21 +72,23 @@ test('audit', async () => {
 	const step = new ScanStep5({
 		db,
 		logger,
+		scanCodeBinary: testConf.scanCodeBinary,
 		auditOutPath: testConf.auditOutPath,
 		verbose: true,
+		print: false,
 	})
 	const auditTree = await step.run()
 
 	const countFindings = auditTree.countLeaves()
-	expect(countFindings).toBe(1)
+	t.match(countFindings, 1)
 
-	const detailedReport = auditTree.root['a1']['with-gpl.txt'].scanCodeReport
+	const scanCodeEntry = auditTree.root['a1']['with-gpl.txt'].scanCodeEntry
 
-	const gplFinding = detailedReport.licenses[0]
-	expect(gplFinding.matched_text).toContain('GPL License // line 2')
+	const gplFinding = scanCodeEntry.license_detections[0].matches[0]
+	t.match(gplFinding.matched_text, 'GPL License // line 2')
 
-	const mitFinding = detailedReport.licenses[1]
-	expect(mitFinding.matched_text).toContain('MIT License // line 3')
+	const mitFinding = scanCodeEntry.license_detections[0].matches[1]
+	t.match(mitFinding.matched_text, 'MIT License // line 3')
 })
 
 function prepareDbFiles(db: LocalDatabase, files: AnalysedFile[]) {

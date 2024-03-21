@@ -1,13 +1,16 @@
+import t from 'tap'
 import { $, globby } from 'zx'
-import { ScanStep2 } from './scan-step-2'
-import type { FileStub } from './test-utils'
-import { createTestConfig, prepareDirtyFiles, testLogger } from './test-utils'
 
-// Allow extractcode to take some time.
-jest.setTimeout(10_000)
+import { ScanStep2 } from './scan-step-2.js'
+import type { FileStub } from './test-utils.js'
+import {
+	createTestConfig,
+	prepareDirtyFiles,
+	testLogger,
+} from './test-utils.js'
 
-test('extract archives', async () => {
-	const testConf = await createTestConfig()
+t.test('extract archives', async (t) => {
+	const testConf = await createTestConfig(t.fullname)
 	const logger = testLogger()
 	$.verbose = false
 
@@ -42,5 +45,5 @@ test('extract archives', async () => {
 	await step.run()
 
 	const finalDirtyFiles = await globby(`${testConf.dirtyRoot}/**`)
-	expect(finalDirtyFiles.length).toBe(4)
+	t.match(finalDirtyFiles.length, 4)
 })

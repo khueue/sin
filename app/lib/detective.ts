@@ -1,43 +1,32 @@
-import type { AnalysedFile, LicenseInfo } from './types'
+import type { AnalysedFile } from './types.js'
 
 export class Detective {
-	allowedSpecificLicenses: string[]
-	allowedLicenseCategories: string[]
+	allowedLicenses: string[]
 
-	constructor(
-		allowedSpecificLicenses: string[],
-		allowedLicenseCategories: string[],
-	) {
-		this.allowedSpecificLicenses = allowedSpecificLicenses
-		this.allowedLicenseCategories = allowedLicenseCategories
+	constructor(allowedLicenses: string[]) {
+		this.allowedLicenses = allowedLicenses
 	}
 
 	fileNeedsInvestigation(node: AnalysedFile) {
 		if (node.currentAcceptedAt) {
 			return false
 		}
-		if (this.allLicensesAreAccepted(node.licenses)) {
+		if (this.allLicensesAreAllowed(node.licenses)) {
 			return false
 		}
 		return true
 	}
 
-	allLicensesAreAccepted(licenses?: LicenseInfo[]) {
+	allLicensesAreAllowed(licenses?: string[]) {
 		for (const license of licenses ?? []) {
-			if (!this.isAcceptedLicense(license)) {
+			if (!this.isAllowedLicense(license)) {
 				return false
 			}
 		}
 		return true
 	}
 
-	isAcceptedLicense(license: LicenseInfo) {
-		if (this.allowedSpecificLicenses.includes(license.name)) {
-			return true
-		}
-		if (this.allowedLicenseCategories.includes(license.category)) {
-			return true
-		}
-		return false
+	isAllowedLicense(license: string) {
+		return this.allowedLicenses.includes(license)
 	}
 }

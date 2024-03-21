@@ -1,8 +1,10 @@
-import { Detective } from './detective'
-import type { AnalysedFile } from './types'
+import t from 'tap'
 
-test('innocent files', async () => {
-	const detective = new Detective(['Ruby License'], ['Permissive'])
+import { Detective } from './detective.js'
+import type { AnalysedFile } from './types.js'
+
+t.test('innocent files', async (t) => {
+	const detective = new Detective(['mit', 'bsd-new'])
 
 	let file: AnalysedFile
 	let suspicious: boolean
@@ -11,57 +13,33 @@ test('innocent files', async () => {
 		filePath: 'some/file.txt',
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	expect(suspicious).toBeFalsy()
+	t.match(suspicious, false)
 
 	file = {
 		filePath: 'some/file.txt',
-		licenses: [
-			{
-				name: 'Ruby License',
-				category: '',
-			},
-			{
-				name: '',
-				category: 'Permissive',
-			},
-		],
+		licenses: ['bsd-new'],
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	expect(suspicious).toBeFalsy()
+	t.match(suspicious, false)
 
 	file = {
 		filePath: 'some/file.txt',
-		licenses: [
-			{
-				name: 'GPL',
-				category: '',
-			},
-		],
-		currentAcceptedAt: new Date(),
+		licenses: ['bsd-new', 'mit'],
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	expect(suspicious).toBeFalsy()
+	t.match(suspicious, false)
 })
 
-test('suspicious files', async () => {
-	const detective = new Detective(['Ruby License'], ['Permissive'])
+t.test('suspicious files', async (t) => {
+	const detective = new Detective(['mit', 'bsd-new'])
 
 	let file: AnalysedFile
 	let suspicious: boolean
 
 	file = {
 		filePath: 'some/file.txt',
-		licenses: [
-			{
-				name: 'What Is This License',
-				category: '',
-			},
-			{
-				name: '',
-				category: 'Permissive',
-			},
-		],
+		licenses: ['mit', 'gpl-1.0-plus'],
 	}
 	suspicious = detective.fileNeedsInvestigation(file)
-	expect(suspicious).toBeTruthy()
+	t.match(suspicious, true)
 })

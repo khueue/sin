@@ -1,11 +1,17 @@
+import t from 'tap'
 import { globby } from 'zx'
-import { LocalDatabase } from './db'
-import { ScanStep1 } from './scan-step-1'
-import type { FileStub } from './test-utils'
-import { createTestConfig, prepareSourceFiles, testLogger } from './test-utils'
 
-test('2 dirty', async () => {
-	const testConf = await createTestConfig()
+import { LocalDatabase } from './db.js'
+import { ScanStep1 } from './scan-step-1.js'
+import type { FileStub } from './test-utils.js'
+import {
+	createTestConfig,
+	prepareSourceFiles,
+	testLogger,
+} from './test-utils.js'
+
+t.test('2 dirty', async (t) => {
+	const testConf = await createTestConfig(t.fullname)
 	const logger = testLogger()
 
 	const db = new LocalDatabase({
@@ -39,11 +45,11 @@ test('2 dirty', async () => {
 	await step.run('**')
 
 	const dirtyFiles = await globby(`${testConf.dirtyRoot}/**`)
-	expect(dirtyFiles.length).toBe(2)
+	t.match(dirtyFiles.length, 2)
 })
 
-test('1 unchanged, 1 dirty', async () => {
-	const testConf = await createTestConfig()
+t.test('1 unchanged, 1 dirty', async (t) => {
+	const testConf = await createTestConfig(t.fullname)
 	const logger = testLogger()
 
 	const db = new LocalDatabase({
@@ -78,5 +84,5 @@ test('1 unchanged, 1 dirty', async () => {
 	await step1.run('**')
 
 	const dirtyFiles = await globby(`${testConf.dirtyRoot}/**`)
-	expect(dirtyFiles.length).toBe(1)
+	t.match(dirtyFiles.length, 1)
 })

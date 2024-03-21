@@ -1,8 +1,9 @@
 import { basename } from 'path'
-import type { Detective } from './detective'
-import type { AnalysedFile } from './types'
 
-// @todo XXX Proper recursive type with AnalysedFile as leaf?
+import type { Detective } from './detective.js'
+import type { AnalysedFile } from './types.js'
+
+// @todo Proper recursive type with AnalysedFile as leaf?
 export type TreeNode = Record<string, any>
 
 export class FileTree {
@@ -65,7 +66,7 @@ export class FileTree {
 			if (this.isFileNode(value)) {
 				const fileName = basename(value.filePath).toLowerCase()
 				if (value.isLegalDocument && fileName.includes('license')) {
-					if (this.detective.allLicensesAreAccepted(value.licenses)) {
+					if (this.detective.allLicensesAreAllowed(value.licenses)) {
 						return true
 					}
 				}

@@ -1,18 +1,17 @@
-#!/usr/bin/env ts-node-transpile-only
-
 import chalk from 'chalk'
 import { Command } from 'commander'
 import { mkdir, writeFile } from 'fs/promises'
 import { basename, dirname } from 'path'
-import type { LocalDatabase } from './db'
-import { Detective } from './detective'
-import { ScanStep1 } from './scan-step-1'
-import { ScanStep2 } from './scan-step-2'
-import { ScanStep3 } from './scan-step-3'
-import { ScanStep4 } from './scan-step-4'
-import { ScanStep5 } from './scan-step-5'
-import { FileTree } from './tree'
-import type { AnalysedFile, AnalysedFileRow, BasicLogger } from './types'
+
+import type { LocalDatabase } from './db.js'
+import { Detective } from './detective.js'
+import { ScanStep1 } from './scan-step-1.js'
+import { ScanStep2 } from './scan-step-2.js'
+import { ScanStep3 } from './scan-step-3.js'
+import { ScanStep4 } from './scan-step-4.js'
+import { ScanStep5 } from './scan-step-5.js'
+import { FileTree } from './tree.js'
+import type { AnalysedFile, AnalysedFileRow, BasicLogger } from './types.js'
 
 interface Config {
 	db: LocalDatabase
@@ -24,6 +23,7 @@ interface Config {
 	sourceRoot: string
 	dirtyRoot: string
 	reportRoot: string
+	scanCodeBinary: string
 	scanCodeOutPath: string
 	auditOutPath: string
 	acceptedOutPath: string
@@ -78,10 +78,8 @@ export class Cli {
 		this.program
 			.command('audit')
 			.description(`Generate report of suspicious files`)
-			.option(
-				'--verbose',
-				'Run on-the-fly ScanCode analysis showing more detailed license info for each finding',
-			)
+			.option('--verbose', 'Include ScanCode analysis for each finding')
+			.option('--print', 'Print entire audit to screen')
 			.action(async (options: any) => {
 				await this.audit(options)
 			})
@@ -130,59 +128,36 @@ export class Cli {
 				this.unaccept(pattern)
 			})
 
+		const descLicenseName = [
+			`Key of specific license, e.g. 'bsd-new'`,
+			`See: https://scancode-licensedb.aboutcode.org/`,
+		].join('\n')
+
 		const licenses = this.program
 			.command('licenses')
 			.description(`Manage globally allowed licenses (applied on every audit)`)
 		const licensesList = licenses
 			.command('list')
 			.description(`List accepted licenses`)
-		const licensesAllow = licenses
-			.command('allow')
-			.description(`Globally allow a license`)
-		const licensesUnallow = licenses
-			.command('unallow')
-			.description(`Globally unallow a previously allowed license`)
-
-		const descLicenseName = `Name of specific license, e.g. 'Ruby License'`
-		const descLicenseCategory = `Name of license category, e.g. 'Public Domain'`
 
 		licensesList.action(() => {
 			this.printAllowedLicenses()
 		})
 
-		licensesAllow
-			.command('specific')
-			.description(`Globally allow specific license`)
+		licenses
+			.command('allow')
+			.description(`Globally allow a license`)
 			.argument('<name>', descLicenseName)
 			.action((name: string) => {
-				this.allowSpecificLicense(name)
+				this.allowLicense(name)
 				this.printAllowedLicenses()
 			})
-
-		licensesUnallow
-			.command('specific')
-			.description(`Globally unallow specific license`)
+		licenses
+			.command('unallow')
+			.description(`Globally unallow a previously allowed license`)
 			.argument('<name>', descLicenseName)
 			.action((name: string) => {
-				this.unallowSpecificLicense(name)
-				this.printAllowedLicenses()
-			})
-
-		licensesAllow
-			.command('category')
-			.description(`Globally allow license category`)
-			.argument('<name>', descLicenseCategory)
-			.action((name: string) => {
-				this.allowLicenseCategory(name)
-				this.printAllowedLicenses()
-			})
-
-		licensesUnallow
-			.command('category')
-			.description(`Globally unallow license category`)
-			.argument('<name>', descLicenseCategory)
-			.action((name: string) => {
-				this.unallowLicenseCategory(name)
+				this.unallowLicense(name)
 				this.printAllowedLicenses()
 			})
 
@@ -200,7 +175,7 @@ export class Cli {
 
 	async scan(scanPattern: string, options: any) {
 		const delimiter = ''.padEnd(72, '=')
-		this.rawLogger.info(chalk`{blue ${delimiter}}`)
+		this.rawLogger.info(chalk.blue(delimiter))
 		this.rawLogger.info()
 
 		const errors: Error[] = []
@@ -231,15 +206,18 @@ export class Cli {
 				dirtyRoot: this.config.dirtyRoot,
 				logger: this.logger,
 				skipExtractArchives: this.config.skipExtractArchives ?? false,
+				verbose,
 			})
 			await step2.run()
 		} catch (e: any) {
 			errors.push(e)
 			this.logger.error(
-				chalk`{red STEP 2 failed with errors, continuing anyway.}`,
+				chalk.red(`STEP 2 failed with errors, continuing anyway.`),
 			)
 			this.logger.error(
-				chalk`{red This probably just means that a few archives couldn't be decompressed.}`,
+				chalk.red(
+					`This probably just means that a few archives couldn't be decompressed.`,
+				),
 			)
 		}
 		this.rawLogger.timeEnd(label)
@@ -251,6 +229,7 @@ export class Cli {
 			const step3 = new ScanStep3({
 				dirtyRoot: this.config.dirtyRoot,
 				logger: this.logger,
+				scanCodeBinary: this.config.scanCodeBinary,
 				scanCodeOutPath: this.config.scanCodeOutPath,
 				verbose,
 			})
@@ -258,7 +237,7 @@ export class Cli {
 		} catch (e: any) {
 			errors.push(e)
 			this.logger.error(
-				chalk`{red STEP 3 failed with errors, continuing anyway.}`,
+				chalk.red('STEP 3 failed with errors, continuing anyway.'),
 			)
 		}
 		this.rawLogger.timeEnd(label)
@@ -280,7 +259,7 @@ export class Cli {
 		this.rawLogger.timeEnd(label)
 		this.rawLogger.info()
 
-		this.logger.info(chalk`{blue Run 'audit' to investigate any findings.}`)
+		this.logger.info(chalk.blue(`Run 'audit' to investigate any findings.`))
 
 		if (errors.length) {
 			this.rawLogger.info()
@@ -295,10 +274,15 @@ export class Cli {
 		const step5 = new ScanStep5({
 			db: this.db,
 			auditOutPath: this.config.auditOutPath,
+			scanCodeBinary: this.config.scanCodeBinary,
 			logger: this.logger,
 			verbose: options.verbose ?? false,
+			print: options.print,
 		})
-		await step5.run()
+		const auditTree = await step5.run()
+		if (auditTree.countLeaves()) {
+			throw new Error('graceful.audit_with_findings')
+		}
 	}
 
 	async saveFile(path: string, contents: string) {
@@ -328,11 +312,11 @@ export class Cli {
 			}
 			return
 		}
-		this.rawLogger.info(chalk`{blue ${''.padEnd(72, '>')}}`)
+		this.rawLogger.info(chalk.blue(`${''.padEnd(72, '>')}`))
 		this.rawLogger.info()
 		this.rawLogger.info(row.content_text?.trim())
 		this.rawLogger.info()
-		this.rawLogger.info(chalk`{blue ${''.padEnd(72, '<')}}`)
+		this.rawLogger.info(chalk.blue(`${''.padEnd(72, '<')}`))
 	}
 
 	async listAccepts(options: any) {
@@ -415,7 +399,7 @@ export class Cli {
 			files.push(file)
 		}
 
-		const detective = new Detective([], [])
+		const detective = new Detective([])
 		const tree = new FileTree(Object.values(files), detective)
 		if (Object.keys(tree.root).length) {
 			const json = tree.toJson()
@@ -463,10 +447,7 @@ export class Cli {
 		reason = reason.trim()
 		const verbose = this.program.opts().verbose
 		const files: AnalysedFile[] = []
-		const detective = new Detective(
-			this.db.allowedSpecificLicenses,
-			this.db.allowedLicenseCategories,
-		)
+		const detective = new Detective(this.db.allowedLicenses)
 		for (const row of rows) {
 			const file = this.db.analysedFileRowToObject(row)
 			if (detective.fileNeedsInvestigation(file)) {
@@ -578,9 +559,9 @@ export class Cli {
 		this.logger.info(`Unaccepted: ${filePath}`)
 	}
 
-	allowSpecificLicense(name: string) {
+	allowLicense(name: string) {
 		const stmt = this.db.sqlite.prepare(`
-			INSERT INTO accepted_license_names(name) VALUES(:name)
+			INSERT INTO allowed_licenses(name) VALUES(:name)
 			ON CONFLICT(name) DO
 			UPDATE SET name = :name
 		`)
@@ -589,14 +570,14 @@ export class Cli {
 		})
 		if (!results) {
 			this.logger.error(`Something went wrong.`)
-			throw new Error(`Could not save specific license allow: ${name}`)
+			throw new Error(`Could not save license allow: ${name}`)
 		}
-		this.logger.info(`Globally accepting specific license: ${name}`)
+		this.logger.info(`Globally allowing license: ${name}`)
 	}
 
-	unallowSpecificLicense(name: string) {
+	unallowLicense(name: string) {
 		const stmt = this.db.sqlite.prepare(`
-			DELETE FROM accepted_license_names
+			DELETE FROM allowed_licenses
 			WHERE name = :name
 		`)
 		const results = stmt.run({
@@ -604,48 +585,15 @@ export class Cli {
 		})
 		if (!results) {
 			this.logger.error(`Something went wrong.`)
-			throw new Error(`Could not save license category allow: ${name}`)
+			throw new Error(`Could not save license allow: ${name}`)
 		}
-		this.logger.info(`No longer globally accepting specific license: ${name}`)
-	}
-
-	allowLicenseCategory(name: string) {
-		const stmt = this.db.sqlite.prepare(`
-			INSERT INTO accepted_license_categories(name) VALUES(:name)
-			ON CONFLICT(name) DO
-			UPDATE SET name = :name
-		`)
-		const results = stmt.run({
-			name,
-		})
-		if (!results) {
-			this.logger.error(`Something went wrong.`)
-			return
-		}
-		this.logger.info(`Globally accepting license category: ${name}`)
-	}
-
-	unallowLicenseCategory(name: string) {
-		const stmt = this.db.sqlite.prepare(`
-			DELETE FROM accepted_license_categories
-			WHERE name = :name
-		`)
-		const results = stmt.run({
-			name,
-		})
-		if (!results) {
-			this.logger.error(`Something went wrong.`)
-			return
-		}
-		this.logger.info(`No longer globally accepting license category: ${name}`)
+		this.logger.info(`No longer globally accepting license: ${name}`)
 	}
 
 	printAllowedLicenses() {
 		this.db.loadGlobalSettings()
-		const names = this.db.allowedSpecificLicenses
-		const categories = this.db.allowedLicenseCategories
-		this.logger.info(`Allowed specific licenses:`, names)
-		this.logger.info(`Allowed license categories:`, categories)
+		const names = this.db.allowedLicenses
+		this.logger.info(`Allowed licenses:`, names)
 	}
 
 	async listAttributions() {
