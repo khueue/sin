@@ -1,16 +1,19 @@
 import { existsSync } from 'fs'
 import { readFile } from 'fs/promises'
+import t from 'tap'
 import { $ } from 'zx'
-import { ScanStep3 } from './scan-step-3'
-import type { FileStub } from './test-utils'
-import { createTestConfig, prepareDirtyFiles, testLogger } from './test-utils'
-import type { ScanCodeEntry } from './types'
 
-// Allow scancode to take some time.
-jest.setTimeout(30_000)
+import { ScanStep3 } from './scan-step-3.js'
+import type { FileStub } from './test-utils.js'
+import {
+	createTestConfig,
+	prepareDirtyFiles,
+	testLogger,
+} from './test-utils.js'
+import type { ScanCodeEntry } from './types.js'
 
-test('scan dirty files', async () => {
-	const testConf = await createTestConfig()
+t.test('scan dirty files', async (t) => {
+	const testConf = await createTestConfig(t.fullname)
 	const logger = testLogger()
 	$.verbose = false
 
@@ -43,22 +46,23 @@ test('scan dirty files', async () => {
 	const step = new ScanStep3({
 		logger,
 		dirtyRoot: testConf.dirtyRoot,
+		scanCodeBinary: testConf.scanCodeBinary,
 		scanCodeOutPath: testConf.scanCodeOutPath,
 		verbose: true,
 	})
 	await step.run()
 
-	expect(existsSync(testConf.scanCodeOutPath)).toBeTruthy()
+	t.match(existsSync(testConf.scanCodeOutPath), true)
 
 	const reportContents = await readFile(testConf.scanCodeOutPath, 'utf-8')
 	const scannedFiles: ScanCodeEntry[] = JSON.parse(reportContents).files
 	for (const dirtyFile of initialDirtyFiles) {
 		const scanEntry = getScanCodeEntry(scannedFiles, dirtyFile.filePath)
-		const numLicenseFindings = Object.keys(scanEntry.licenses).length
+		const numLicenseFindings = scanEntry.license_detections?.length
 		if (dirtyFile.shouldHaveLicenseFindings) {
-			expect(numLicenseFindings).toBeTruthy()
+			t.ok(numLicenseFindings)
 		} else {
-			expect(numLicenseFindings).toBeFalsy()
+			t.notOk(numLicenseFindings)
 		}
 	}
 })

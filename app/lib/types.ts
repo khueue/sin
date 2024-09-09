@@ -1,8 +1,3 @@
-export interface LicenseInfo {
-	name: string
-	category: string
-}
-
 export interface AnalysedFile {
 	filePath: string
 	contentSha256?: string
@@ -11,7 +6,8 @@ export interface AnalysedFile {
 	currentAcceptedReason?: string
 	currentAcceptedAt?: Date
 	isLegalDocument?: boolean
-	licenses?: LicenseInfo[]
+	licenses?: string[]
+	scanCodeEntry?: ScanCodeEntry
 	dirty?: boolean // Used to determine if file is new/modified.
 }
 
@@ -23,7 +19,8 @@ export interface AnalysedFileRow {
 	current_accepted_reason?: string
 	current_accepted_at?: string // Date as string.
 	is_legal_document?: number // Boolean as 1 or 0.
-	licenses?: string // LicenseInfo[] as stringified JSON.
+	licenses?: string // Licenses as stringified JSON list.
+	scancode_entry?: string // ScanCode entry as stringified JSON object.
 }
 
 // Subset of what ScanCode generates for each file.
@@ -31,8 +28,14 @@ export interface ScanCodeEntry {
 	path: string // File path.
 	type: string // File type.
 	sha256: string // SHA256 of content.
-	licenses: LicenseInfo[] // License infos.
 	is_legal?: boolean // Considered a legal document (e.g. license file).
+	is_text?: boolean // Textual.
+	license_detections?: {
+		matches: {
+			license_expression: string
+			matched_text: string
+		}[]
+	}[]
 }
 
 export interface BasicLogger {

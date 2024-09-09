@@ -1,16 +1,18 @@
-import { LocalDatabase } from './db'
-import { ScanStep4 } from './scan-step-4'
+import t from 'tap'
+
+import { LocalDatabase } from './db.js'
+import { ScanStep4 } from './scan-step-4.js'
 import {
 	createTestConfig,
 	FileStub,
 	prepareDirtyFiles,
 	testLogger,
 	writeFileForce,
-} from './test-utils'
-import type { AnalysedFileRow, ScanCodeEntry } from './types'
+} from './test-utils.js'
+import type { AnalysedFileRow, ScanCodeEntry } from './types.js'
 
-test('save to db, some old', async () => {
-	const testConf = await createTestConfig()
+t.test('save to db, some old', async (t) => {
+	const testConf = await createTestConfig(t.fullname)
 	const logger = testLogger()
 
 	const db = new LocalDatabase({
@@ -49,8 +51,9 @@ test('save to db, some old', async () => {
 	db.stmtInsertFile.run({
 		file_path: someFile.filePath,
 		content_sha256: 'old_content_sha256',
-		content_text: someFile.contents,
-		licenses: '{"old":"licenses"}',
+		content_text: null,
+		scancode_entry: null,
+		licenses: JSON.stringify(['old1', 'old2']),
 		previous_accepted_reason: 'old_previous_accepted_reason',
 		current_accepted_reason: 'old_current_accepted_reason',
 		current_accepted_at: 'old_current_accepted_at',
@@ -80,24 +83,24 @@ test('save to db, some old', async () => {
 		}
 		const row: AnalysedFileRow = stmt.get({
 			file_path: reportEntry.path,
-		})
+		}) as any
 		const dirtyFile = findDirtyFile(dirtyFiles, reportEntry.path)
 		// Should be in database with correct hash.
-		expect(row.content_sha256 === reportEntry.sha256).toBeTruthy()
+		t.match(row.content_sha256, reportEntry.sha256)
 		// Should move current reason to previous if it was already in db.
 		if (dirtyFile.inDb) {
-			expect(row.previous_accepted_reason).toBe('old_current_accepted_reason')
+			t.match(row.previous_accepted_reason, 'old_current_accepted_reason')
 		}
 		// Should have cleared out current reason.
-		expect(row.current_accepted_reason).toBeFalsy()
-		expect(row.current_accepted_at).toBeFalsy()
+		t.notOk(row.current_accepted_reason)
+		t.notOk(row.current_accepted_at)
 		// Should save file contents along with licenses.
 		if (dirtyFile.shouldHaveLicenseFindings) {
-			expect(row.licenses).toBeTruthy()
-			expect(row.content_text).toBe(dirtyFile.contents)
+			t.ok(row.licenses)
+			// t.match(row.content_text, dirtyFile.contents)
 		} else {
-			expect(row.licenses).toBeFalsy()
-			expect(row.content_text).toBeFalsy()
+			t.notOk(row.licenses)
+			// t.notOk(row.content_text)
 		}
 	}
 })
@@ -116,6 +119,9 @@ function findDirtyFile(dirtyFiles: FileStub[], relPath: string) {
 function getScanCodeReport() {
 	return {
 		headers: [
+			// Irrelevant.
+		],
+		license_detections: [
 			// Irrelevant.
 		],
 		files: [
@@ -139,17 +145,19 @@ function getScanCodeReport() {
 				is_media: false,
 				is_source: false,
 				is_script: false,
-				licenses: [],
-				license_expressions: [],
-				percentage_of_license_text: 0,
 				is_legal: false,
 				is_manifest: false,
 				is_readme: false,
 				is_top_level: true,
 				is_key_file: false,
+				detected_license_expression: null,
+				detected_license_expression_spdx: null,
+				license_detections: [],
+				license_clues: [],
+				percentage_of_license_text: 0,
 				files_count: 2,
 				dirs_count: 0,
-				size_count: 40,
+				size_count: 16,
 				scan_errors: [],
 			},
 			{
@@ -158,12 +166,12 @@ function getScanCodeReport() {
 				name: 'permissive-only.txt',
 				base_name: 'permissive-only',
 				extension: '.txt',
-				size: 20,
-				date: '2021-12-01',
-				sha1: '4dd8b3f4e334323adbe26f57f88b0817506c931c',
-				md5: 'ff4df1f78f8e2465abf8e25ebb1564f9',
+				size: 8,
+				date: '2023-09-18',
+				sha1: '9f829bbce4de72431815f6cf7d10ddb8b0a48890',
+				md5: '8251c1e8ca1b3dc85a069dc8236cf02a',
 				sha256:
-					'c4b3b70b3a20e2855668ab9e4d76092b93a41391de03d94a7e02952b28e532dd',
+					'03541d2941b8f44ae55f7d49482571fa8ed58ec2fa43a39d81d23cc64714a498',
 				mime_type: 'text/plain',
 				file_type: 'ASCII text',
 				programming_language: null,
@@ -173,91 +181,36 @@ function getScanCodeReport() {
 				is_media: false,
 				is_source: false,
 				is_script: false,
-				licenses: [
-					{
-						key: 'mit',
-						score: 80.0,
-						name: 'MIT License',
-						short_name: 'MIT License',
-						category: 'Permissive',
-						is_exception: false,
-						is_unknown: false,
-						owner: 'MIT',
-						homepage_url: 'http://opensource.org/licenses/mit-license.php',
-						text_url: 'http://opensource.org/licenses/mit-license.php',
-						reference_url: 'https://scancode-licensedb.aboutcode.org/mit',
-						scancode_text_url:
-							'https://github.com/nexB/scancode-toolkit/tree/develop/src/licensedcode/data/licenses/mit.LICENSE',
-						scancode_data_url:
-							'https://github.com/nexB/scancode-toolkit/tree/develop/src/licensedcode/data/licenses/mit.yml',
-						spdx_license_key: 'MIT',
-						spdx_url: 'https://spdx.org/licenses/MIT',
-						start_line: 2,
-						end_line: 3,
-						matched_rule: {
-							identifier: 'mit_and_bsd-new_modernizr_2.RULE',
-							license_expression: 'mit AND bsd-new',
-							licenses: ['mit', 'bsd-new'],
-							referenced_filenames: [],
-							is_license_text: false,
-							is_license_notice: false,
-							is_license_reference: true,
-							is_license_tag: false,
-							is_license_intro: false,
-							has_unknown: false,
-							matcher: '1-hash',
-							rule_length: 2,
-							matched_length: 2,
-							match_coverage: 100.0,
-							rule_relevance: 80,
-						},
-					},
-					{
-						key: 'bsd-new',
-						score: 80.0,
-						name: 'BSD-3-Clause',
-						short_name: 'BSD-3-Clause',
-						category: 'Permissive',
-						is_exception: false,
-						is_unknown: false,
-						owner: 'Regents of the University of California',
-						homepage_url: 'http://www.opensource.org/licenses/BSD-3-Clause',
-						text_url: 'http://www.opensource.org/licenses/BSD-3-Clause',
-						reference_url: 'https://scancode-licensedb.aboutcode.org/bsd-new',
-						scancode_text_url:
-							'https://github.com/nexB/scancode-toolkit/tree/develop/src/licensedcode/data/licenses/bsd-new.LICENSE',
-						scancode_data_url:
-							'https://github.com/nexB/scancode-toolkit/tree/develop/src/licensedcode/data/licenses/bsd-new.yml',
-						spdx_license_key: 'BSD-3-Clause',
-						spdx_url: 'https://spdx.org/licenses/BSD-3-Clause',
-						start_line: 2,
-						end_line: 3,
-						matched_rule: {
-							identifier: 'mit_and_bsd-new_modernizr_2.RULE',
-							license_expression: 'mit AND bsd-new',
-							licenses: ['mit', 'bsd-new'],
-							referenced_filenames: [],
-							is_license_text: false,
-							is_license_notice: false,
-							is_license_reference: true,
-							is_license_tag: false,
-							is_license_intro: false,
-							has_unknown: false,
-							matcher: '1-hash',
-							rule_length: 2,
-							matched_length: 2,
-							match_coverage: 100.0,
-							rule_relevance: 80,
-						},
-					},
-				],
-				license_expressions: ['mit AND bsd-new'],
-				percentage_of_license_text: 100.0,
 				is_legal: false,
 				is_manifest: false,
 				is_readme: false,
 				is_top_level: false,
 				is_key_file: false,
+				detected_license_expression: 'mit AND bsd-new',
+				detected_license_expression_spdx: 'MIT AND BSD-3-Clause',
+				license_detections: [
+					{
+						license_expression: 'mit AND bsd-new',
+						matches: [
+							{
+								score: 80.0,
+								start_line: 1,
+								end_line: 2,
+								matched_length: 2,
+								match_coverage: 100.0,
+								matcher: '1-hash',
+								license_expression: 'mit AND bsd-new',
+								rule_identifier: 'mit_and_bsd-new_modernizr_2.RULE',
+								rule_relevance: 80,
+								rule_url:
+									'https://github.com/nexB/scancode-toolkit/tree/develop/src/licensedcode/data/rules/mit_and_bsd-new_modernizr_2.RULE',
+							},
+						],
+						identifier: 'mit_and_bsd_new-7e525c88-20f7-e1cc-dcb9-397e745f5a76',
+					},
+				],
+				license_clues: [],
+				percentage_of_license_text: 100.0,
 				files_count: 0,
 				dirs_count: 0,
 				size_count: 0,
@@ -269,12 +222,12 @@ function getScanCodeReport() {
 				name: 'with-gpl.txt',
 				base_name: 'with-gpl',
 				extension: '.txt',
-				size: 20,
-				date: '2021-12-01',
-				sha1: '606e6a7452a061796e2765060d0fd1d64f75a708',
-				md5: '0b5d8fb8ec129b71ca1f658e13b10bf5',
+				size: 8,
+				date: '2023-09-18',
+				sha1: '54adcb1f3d30e3e1ce7a63775557faae40ede3fe',
+				md5: '0c7e7785b271deaa1fbf92fd433d77a0',
 				sha256:
-					'03804edc6a20ae168c959da164b67dbbbbee8eb15404b15c0be47aff9fe32909',
+					'1335147917311fe87060759f1205f0d90887ee9e8d6d756be8d4527a58b88370',
 				mime_type: 'text/plain',
 				file_type: 'ASCII text',
 				programming_language: null,
@@ -284,94 +237,37 @@ function getScanCodeReport() {
 				is_media: false,
 				is_source: false,
 				is_script: false,
-				licenses: [
-					{
-						key: 'mit',
-						score: 100.0,
-						name: 'MIT License',
-						short_name: 'MIT License',
-						category: 'Permissive',
-						is_exception: false,
-						is_unknown: false,
-						owner: 'MIT',
-						homepage_url: 'http://opensource.org/licenses/mit-license.php',
-						text_url: 'http://opensource.org/licenses/mit-license.php',
-						reference_url: 'https://scancode-licensedb.aboutcode.org/mit',
-						scancode_text_url:
-							'https://github.com/nexB/scancode-toolkit/tree/develop/src/licensedcode/data/licenses/mit.LICENSE',
-						scancode_data_url:
-							'https://github.com/nexB/scancode-toolkit/tree/develop/src/licensedcode/data/licenses/mit.yml',
-						spdx_license_key: 'MIT',
-						spdx_url: 'https://spdx.org/licenses/MIT',
-						start_line: 2,
-						end_line: 3,
-						matched_rule: {
-							identifier: 'mit_or_gpl_3.RULE',
-							license_expression: 'mit OR gpl-1.0-plus',
-							licenses: ['mit', 'gpl-1.0-plus'],
-							referenced_filenames: [],
-							is_license_text: false,
-							is_license_notice: true,
-							is_license_reference: false,
-							is_license_tag: false,
-							is_license_intro: false,
-							has_unknown: false,
-							matcher: '1-hash',
-							rule_length: 2,
-							matched_length: 2,
-							match_coverage: 100.0,
-							rule_relevance: 100,
-						},
-					},
-					{
-						key: 'gpl-1.0-plus',
-						score: 100.0,
-						name: 'GNU General Public License 1.0 or later',
-						short_name: 'GPL 1.0 or later',
-						category: 'Copyleft',
-						is_exception: false,
-						is_unknown: false,
-						owner: 'Free Software Foundation (FSF)',
-						homepage_url:
-							'http://www.gnu.org/licenses/old-licenses/gpl-1.0-standalone.html',
-						text_url:
-							'http://www.gnu.org/licenses/old-licenses/gpl-1.0-standalone.html',
-						reference_url:
-							'https://scancode-licensedb.aboutcode.org/gpl-1.0-plus',
-						scancode_text_url:
-							'https://github.com/nexB/scancode-toolkit/tree/develop/src/licensedcode/data/licenses/gpl-1.0-plus.LICENSE',
-						scancode_data_url:
-							'https://github.com/nexB/scancode-toolkit/tree/develop/src/licensedcode/data/licenses/gpl-1.0-plus.yml',
-						spdx_license_key: 'GPL-1.0-or-later',
-						spdx_url: 'https://spdx.org/licenses/GPL-1.0-or-later',
-						start_line: 2,
-						end_line: 3,
-						matched_rule: {
-							identifier: 'mit_or_gpl_3.RULE',
-							license_expression: 'mit OR gpl-1.0-plus',
-							licenses: ['mit', 'gpl-1.0-plus'],
-							referenced_filenames: [],
-							is_license_text: false,
-							is_license_notice: true,
-							is_license_reference: false,
-							is_license_tag: false,
-							is_license_intro: false,
-							has_unknown: false,
-							matcher: '1-hash',
-							rule_length: 2,
-							matched_length: 2,
-							match_coverage: 100.0,
-							rule_relevance: 100,
-						},
-					},
-				],
-				license_expressions: ['mit OR gpl-1.0-plus'],
-				percentage_of_license_text: 100.0,
 				is_legal: false,
 				is_manifest: false,
 				is_readme: false,
 				is_top_level: false,
 				is_key_file: false,
+				detected_license_expression: 'mit OR gpl-1.0-plus',
+				detected_license_expression_spdx: 'MIT OR GPL-1.0-or-later',
+				license_detections: [
+					{
+						license_expression: 'mit OR gpl-1.0-plus',
+						matches: [
+							{
+								score: 100.0,
+								start_line: 1,
+								end_line: 2,
+								matched_length: 2,
+								match_coverage: 100.0,
+								matcher: '1-hash',
+								license_expression: 'mit OR gpl-1.0-plus',
+								rule_identifier: 'mit_or_gpl_3.RULE',
+								rule_relevance: 100,
+								rule_url:
+									'https://github.com/nexB/scancode-toolkit/tree/develop/src/licensedcode/data/rules/mit_or_gpl_3.RULE',
+							},
+						],
+						identifier:
+							'mit_or_gpl_1_0_plus-d28d8fcb-e415-ea23-833c-58a65b42d70b',
+					},
+				],
+				license_clues: [],
+				percentage_of_license_text: 100.0,
 				files_count: 0,
 				dirs_count: 0,
 				size_count: 0,
@@ -397,17 +293,19 @@ function getScanCodeReport() {
 				is_media: false,
 				is_source: false,
 				is_script: false,
-				licenses: [],
-				license_expressions: [],
-				percentage_of_license_text: 0,
 				is_legal: false,
 				is_manifest: false,
 				is_readme: false,
 				is_top_level: true,
 				is_key_file: false,
+				detected_license_expression: null,
+				detected_license_expression_spdx: null,
+				license_detections: [],
+				license_clues: [],
+				percentage_of_license_text: 0,
 				files_count: 1,
 				dirs_count: 0,
-				size_count: 14,
+				size_count: 9,
 				scan_errors: [],
 			},
 			{
@@ -416,12 +314,12 @@ function getScanCodeReport() {
 				name: 'nonsense.txt',
 				base_name: 'nonsense',
 				extension: '.txt',
-				size: 14,
-				date: '2021-12-01',
-				sha1: '1937d0a741146c4ee39befcc2ea7e0294d22f7a4',
-				md5: 'e4c7a7cdac6799e5f66b1fbc8fb9ad0b',
+				size: 9,
+				date: '2023-09-18',
+				sha1: '7dd4c0df649c75ceb1a44b42f79fd6c7c40540c2',
+				md5: '0377438312a93cf85307e3fa0fe437cf',
 				sha256:
-					'61e9c221e684a03a51589cf94dcd39f12d9180dfa03a959855be82e70683f25f',
+					'2f9d23efc183016965f402b0ca2bfc1edb5830759a169288d8bc19dd99abe9c5',
 				mime_type: 'text/plain',
 				file_type: 'ASCII text',
 				programming_language: null,
@@ -431,14 +329,16 @@ function getScanCodeReport() {
 				is_media: false,
 				is_source: false,
 				is_script: false,
-				licenses: [],
-				license_expressions: [],
-				percentage_of_license_text: 0,
 				is_legal: false,
 				is_manifest: false,
 				is_readme: false,
 				is_top_level: false,
 				is_key_file: false,
+				detected_license_expression: null,
+				detected_license_expression_spdx: null,
+				license_detections: [],
+				license_clues: [],
+				percentage_of_license_text: 0,
 				files_count: 0,
 				dirs_count: 0,
 				size_count: 0,

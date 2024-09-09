@@ -1,13 +1,9 @@
 import chalk from 'chalk'
 import { existsSync } from 'fs'
 import { readFile } from 'fs/promises'
-import type { LocalDatabase } from './db'
-import type {
-	AnalysedFile,
-	BasicLogger,
-	LicenseInfo,
-	ScanCodeEntry,
-} from './types'
+
+import type { LocalDatabase } from './db.js'
+import type { AnalysedFile, BasicLogger, ScanCodeEntry } from './types.js'
 
 const SHA256_EMPTY_STRING =
 	'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
@@ -34,7 +30,7 @@ export class ScanStep4 {
 	}
 
 	async run() {
-		this.logger.info(chalk`{yellow === STEP 4: Save results to database}`)
+		this.logger.info(chalk.yellow(`=== STEP 4: Save results to database`))
 
 		if (!existsSync(this.scanCodeOutPath)) {
 			this.logger.info(`Nothing to be done (no ScanCode report found).`)
@@ -61,36 +57,42 @@ export class ScanStep4 {
 				continue
 			}
 
-			const file = {
+			const file: AnalysedFile = {
 				filePath: scannedFile.path,
 				contentSha256: scannedFile.sha256 ?? SHA256_EMPTY_STRING,
-			} as AnalysedFile
+			}
 
-			if (scannedFile.licenses.length) {
+			if (scannedFile.license_detections?.length) {
+				file.isLegalDocument = Boolean(scannedFile.is_legal)
+
 				// Gather and de-duplicate license findings.
-				const licensesMap: Record<string, LicenseInfo> = {}
-				for (const foundLicense of scannedFile.licenses) {
-					if (!licensesMap[foundLicense.name]) {
-						// Extract subset of details.
-						licensesMap[foundLicense.name] = {
-							name: foundLicense.name,
-							category: foundLicense.category,
+				const licenses = new Set<string>()
+				scannedFile.license_detections.map((detection) => {
+					detection.matches.map((match) => {
+						const orParts = match.license_expression.split(' OR ')
+						const andParts = match.license_expression.split(' AND ')
+						if (orParts.length > 1) {
+							orParts.map((license) => licenses.add(license))
+						} else if (andParts.length > 1) {
+							andParts.map((license) => licenses.add(license))
+						} else {
+							licenses.add(match.license_expression)
 						}
+					})
+				})
+				if (licenses.size) {
+					file.licenses = Array.from(licenses.values()).sort()
+					file.scanCodeEntry = scannedFile
+
+					// Save file contents only for textual files.
+					if (scannedFile.is_text) {
+						const contentText = await readFile(
+							`${this.dirtyRoot}/${file.filePath}`,
+							'utf-8',
+						)
+						file.contentText = contentText
 					}
 				}
-				const licenses = Object.values(licensesMap)
-				if (licenses.length) {
-					file.licenses = licenses
-
-					// Save file contents only if we have license findings.
-					const contentText = await readFile(
-						`${this.dirtyRoot}/${file.filePath}`,
-						'utf-8',
-					)
-					file.contentText = contentText
-				}
-
-				file.isLegalDocument = Boolean(scannedFile.is_legal)
 			}
 
 			const exists = Boolean(this.previouslyAnalysedFiles[file.filePath])

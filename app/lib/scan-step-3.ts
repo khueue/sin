@@ -4,11 +4,13 @@ import { mkdir } from 'fs/promises'
 import { cpus } from 'os'
 import { dirname } from 'path'
 import { $ } from 'zx'
-import type { BasicLogger } from './types'
+
+import type { BasicLogger } from './types.js'
 
 interface Config {
 	dirtyRoot: string
 	logger: BasicLogger
+	scanCodeBinary: string
 	scanCodeOutPath: string
 	verbose?: boolean
 }
@@ -16,18 +18,20 @@ interface Config {
 export class ScanStep3 {
 	dirtyRoot: string
 	logger: BasicLogger
+	scanCodeBinary: string
 	scanCodeOutPath: string
 	verbose: boolean
 
 	constructor(config: Config) {
 		this.dirtyRoot = config.dirtyRoot
 		this.logger = config.logger
+		this.scanCodeBinary = config.scanCodeBinary
 		this.scanCodeOutPath = config.scanCodeOutPath
 		this.verbose = config.verbose ?? false
 	}
 
 	async run() {
-		this.logger.info(chalk`{yellow === STEP 3: Run ScanCode on dirty files}`)
+		this.logger.info(chalk.yellow(`=== STEP 3: Run ScanCode on dirty files`))
 
 		if (!existsSync(this.dirtyRoot)) {
 			this.logger.info(`Nothing to be done (no dirty files).`)
@@ -38,7 +42,7 @@ export class ScanStep3 {
 
 		const verboseFlag = this.verbose ? '--verbose' : ''
 		const cmd = [
-			'scancode',
+			this.scanCodeBinary,
 			verboseFlag,
 			'--processes',
 			cpus().length,
@@ -46,7 +50,8 @@ export class ScanStep3 {
 			'--info', // Gives sha256 of file contents.
 			'--license', // Gives license information.
 			'--classify', // Gives is_legal flag.
-			'--json',
+			'--license-text', // Gives a copy of the suspicious lines.
+			'--json-pp',
 			this.scanCodeOutPath,
 			this.dirtyRoot,
 		]

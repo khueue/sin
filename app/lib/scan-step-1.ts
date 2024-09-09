@@ -3,8 +3,9 @@ import { createHash } from 'crypto'
 import { copyFile, lstat, mkdir, readFile } from 'fs/promises'
 import { dirname } from 'path'
 import { globby } from 'zx'
-import type { LocalDatabase } from './db'
-import type { AnalysedFile, BasicLogger } from './types'
+
+import type { LocalDatabase } from './db.js'
+import type { AnalysedFile, BasicLogger } from './types.js'
 
 interface Config {
 	db: LocalDatabase
@@ -32,13 +33,13 @@ export class ScanStep1 {
 	}
 
 	async run(scanPattern: string) {
-		this.logger.info(
-			chalk`{yellow === STEP 1: Collect dirty files for scanning}`,
-		)
+		this.logger.info(chalk.yellow`=== STEP 1: Collect dirty files for scanning`)
 
 		if (this.skipIsDirtyCheck) {
 			this.logger.info(
-				chalk`{red SKIPPING loading all previously analysed files from database.}`,
+				chalk.red(
+					'SKIPPING loading all previously analysed files from database.',
+				),
 			)
 		} else {
 			this.logger.info(
@@ -74,7 +75,7 @@ export class ScanStep1 {
 				promises.push(promise)
 			}
 		}
-		// @todo XXX Use something like p-limit to limit concurrency?
+		// @todo Use something like p-limit to limit concurrency?
 		return Promise.all(promises)
 	}
 
@@ -82,10 +83,10 @@ export class ScanStep1 {
 		const contentSha256 = await this.hashFileContents(matchedPath)
 		const relativePath = matchedPath.split(`${this.sourceRoot}/`)[1]
 
-		const file = {
+		const file: AnalysedFile = {
 			contentSha256,
 			filePath: relativePath,
-		} as AnalysedFile
+		}
 
 		const previousFile = this.previouslyAnalysedFiles[relativePath]
 		if (!previousFile || previousFile.contentSha256 !== contentSha256) {
@@ -113,7 +114,7 @@ export class ScanStep1 {
 
 	progressDirtyFile(file: AnalysedFile) {
 		this.dirtyFiles.push(file)
-		if (this.dirtyFiles.length % 5_000 === 0) {
+		if (this.dirtyFiles.length % 1_000 === 0) {
 			this.logger.info(`  staged ${this.dirtyFiles.length} dirty files ...`)
 		}
 	}
